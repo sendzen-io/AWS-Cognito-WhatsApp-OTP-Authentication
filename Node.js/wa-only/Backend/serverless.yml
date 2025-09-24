@@ -1,0 +1,184 @@
+service: cognito-sendzenOTP-auth
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-1'}
+
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+
+    # App-level config from .env
+    SENDZEN_API_URL: ${env:SENDZEN_API_URL}
+    SENDZEN_API_KEY: ${env:SENDZEN_API_KEY}
+    WHATSAPP_FROM: ${env:WHATSAPP_FROM}
+    OTP_EXPIRY_MINUTES: ${env:OTP_EXPIRY_MINUTES}
+    MAX_LOGIN_ATTEMPTS: ${env:MAX_LOGIN_ATTEMPTS}
+    NODE_ENV: ${env:NODE_ENV}
+    LOG_LEVEL: ${env:LOG_LEVEL}
+    WHATSAPP_TEMPLATE_NAME: ${env:WHATSAPP_TEMPLATE_NAME}
+    WHATSAPP_LANG_CODE: ${env:WHATSAPP_LANG_CODE}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:*
+        - lambda:InvokeFunction
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+
+functions:
+  preSignUp:
+    handler: lambda-functions/PreSignup.handler
+  defineAuthChallenge:
+    handler: lambda-functions/DefineAuthChallenge.handler
+  createAuthChallenge:
+    handler: lambda-functions/CreateAuthChallenge.handler
+  verifyAuthChallenge:
+    handler: lambda-functions/VerifyAuthChallenge.handler
+  postConfirmation:
+    handler: lambda-functions/PostConfirmation.handler
+
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:custom.userPoolName}
+        Schema:
+          - Name: phone_number
+            AttributeDataType: String
+            Mutable: true
+            Required: true
+          - Name: whatsapp_verified
+            AttributeDataType: String
+            Mutable: true
+          - Name: auth_purpose
+            AttributeDataType: String
+            Mutable: true
+        UsernameAttributes:
+          - phone_number
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+            RequireUppercase: true
+        MfaConfiguration: "OFF"
+        LambdaConfig:
+          PreSignUp: !GetAtt PreSignUpLambdaFunction.Arn
+          DefineAuthChallenge: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+          CreateAuthChallenge: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+          VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+          PostConfirmation: !GetAtt PostConfirmationLambdaFunction.Arn
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: custom-auth-client-${self:provider.stage}
+        UserPoolId: !Ref CognitoUserPool
+        GenerateSecret: true
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
+          - ALLOW_CUSTOM_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+          - ALLOW_USER_AUTH
+
+    PreSignUpPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt PreSignUpLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    DefineAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    CreateAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    VerifyAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    PostConfirmationPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt PostConfirmationLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+outputs:
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref CognitoUserPool
+    Export:
+      Name: ${self:service}-${self:provider.stage}-UserPoolId
+  
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref CognitoUserPoolClient
+    Export:
+      Name: ${self:service}-${self:provider.stage}-UserPoolClientId
+  
+  UserPoolClientSecret:
+    Description: Cognito User Pool Client Secret
+    Value: !GetAtt CognitoUserPoolClient.ClientSecret
+    Export:
+      Name: ${self:service}-${self:provider.stage}-UserPoolClientSecret
+
+plugins:
+  - serverless-esbuild
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+custom:
+  userPoolName: phone-otp-auth-pool-${self:provider.stage}
+
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: ['aws-sdk']
+    target: 'node18'
+    external: []
+    metafile: false
+    define:
+      'require.resolve': undefined
+    platform: 'node'
+    concurrency: 10
+
+  serverless-offline:
+    httpPort: 3000
+  dotenv:
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
