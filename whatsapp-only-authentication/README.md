@@ -361,15 +361,6 @@ If automatic cleanup fails, manually remove:
 3. CloudWatch Log Groups
 4. IAM Roles and Policies
 
-## 📚 Additional Resources
-
-- [AWS Cognito Documentation](https://docs.aws.amazon.com/cognito/)
-- [Serverless Framework Documentation](https://www.serverless.com/framework/docs/)
-- [SendZen API Documentation](https://www.sendzen.io/docs)
-- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [React Hook Form Documentation](https://react-hook-form.com/)
-
 ## 🔒 Security Considerations
 
 - **IAM Permissions**: Use least privilege principle
