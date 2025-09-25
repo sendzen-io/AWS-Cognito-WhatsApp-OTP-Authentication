@@ -96,6 +96,24 @@ The system implements a sophisticated authentication flow with two distinct phas
 - **Auth Flows**: Custom authentication enabled
 - **Secret Generation**: Disabled for simplicity
 
+## 📊 Architecture Diagrams
+
+The system includes comprehensive PlantUML diagrams that are automatically generated as SVG images:
+
+### 1. **Complete Architecture Diagram**
+![Complete Architecture](docs/architecture-diagram.svg)
+
+### 2. **Authentication Flow Sequence**
+![Authentication Flow](docs/sequence-diagram.svg)
+
+### 3. **Infrastructure Components**
+![Infrastructure Components](docs/component-diagram.svg)
+
+### 4. **Deployment Architecture**
+![Deployment Architecture](docs/deployment-diagram.svg)
+
+> **Note**: These diagrams are automatically generated from PlantUML source files (`.puml`) in the `nodejs-backend/` directory. When you edit any `.puml` file and push to GitHub, the GitHub Actions workflow will automatically regenerate the corresponding SVG images.
+
 ## 🛠 Quick Start
 
 ### Prerequisites
@@ -152,35 +170,6 @@ npm run dev
 3. **Verify**: Check WhatsApp for OTP
 4. **Login**: Test login flow
 5. **Dashboard**: Verify token management
-
-## 📊 Architecture Diagrams
-
-The system includes comprehensive PlantUML diagrams:
-
-### 1. **Complete Architecture Diagram** (`architecture-diagram.puml`)
-- Shows complete backend architecture with all components
-- Includes user registration and login flows
-- All Lambda function interactions
-- SendZen API integration
-- Error handling and logging
-
-### 2. **Authentication Flow Sequence** (`sequence-diagram.puml`)
-- Step-by-step authentication flow
-- Signup and login processes
-- OTP generation and verification
-- Error handling scenarios
-
-### 3. **Infrastructure Components** (`component-diagram.puml`)
-- AWS infrastructure components and relationships
-- AWS Cognito User Pool and Client
-- Lambda functions and their purposes
-- CloudWatch logging and IAM permissions
-
-### 4. **Deployment Architecture** (`deployment-diagram.puml`)
-- Serverless deployment structure
-- AWS resources created by Serverless Framework
-- CloudFormation stack and Lambda function names
-- Log groups and IAM roles
 
 ## 🔧 Configuration
 

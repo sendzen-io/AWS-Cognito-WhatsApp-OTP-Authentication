@@ -1,0 +1,56 @@
+name: Generate PlantUML Diagrams
+
+on:
+  push:
+    paths:
+      - '**/*.puml'
+      - '.github/workflows/generate-diagrams.yml'
+  pull_request:
+    paths:
+      - '**/*.puml'
+      - '.github/workflows/generate-diagrams.yml'
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Download PlantUML
+      run: |
+        wget http://sourceforge.net/projects/plantuml/files/plantuml.jar/download -O plantuml.jar
+
+    - name: Generate SVG diagrams
+      run: |
+        # Create diagrams directory
+        mkdir -p docs
+        
+        # Generate SVG from PlantUML files
+        java -jar plantuml.jar -tsvg nodejs-backend/*.puml -o ../../docs/
+        
+        # List generated files
+        ls -la docs/
+
+    - name: Commit generated diagrams
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if [ -n "$(git status --porcelain docs/)" ]; then
+          git add docs/
+          git commit -m "Auto-generate PlantUML diagrams [skip ci]"
+          git push
+        else
+          echo "No changes to commit"
+        fi
