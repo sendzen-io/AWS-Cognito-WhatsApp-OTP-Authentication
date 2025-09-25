@@ -4,7 +4,7 @@ A comprehensive authentication system that provides multiple ways to implement W
 
 ## 🚀 Overview
 
-This project provides a complete authentication solution using AWS Cognito with WhatsApp OTP verification via SendZen API. It includes multiple implementation options to suit different requirements:
+This project provides a complete authentication solution using AWS Cognito with WhatsApp OTP verification via free SendZen API. It includes multiple implementation options to suit different requirements:
 
 - **WhatsApp Only Authentication**: Phone number-based authentication with WhatsApp OTP
 - **WhatsApp + Email Authentication**: Dual-channel authentication with both WhatsApp and email verification
@@ -187,10 +187,10 @@ serverless deploy --stage prod
 
 #### Step 6: Note Deployment Outputs
 After successful deployment, note these values from the output:
-- **UserPoolId**: `eu-west-1_xxxxxxxxx`
-- **UserPoolClientId**: `xxxxxxxxxxxxxxxxxxxxxxxxxx`
-- **UserPoolClientSecret**: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-- **Region**: `eu-west-1` (or your chosen region)
+- **UserPoolId**: `{region}_xxxxxxxxx` (e.g., `eu-west-1_xxxxxxxxx`)
+- **SignupClientId**: `xxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **LoginClientId**: `xxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Region**: `your_aws_region` (your chosen region)
 
 ### 🎨 Frontend Installation (Node.js)
 
@@ -205,10 +205,10 @@ cd whatsapp-only-authentication/nextjs-frontend
 cp env.example .env.local
 
 # Edit .env.local with values from backend deployment
-NEXT_PUBLIC_AWS_REGION=eu-west-1
-NEXT_PUBLIC_USER_POOL_ID=eu-west-1_xxxxxxxxx
-NEXT_PUBLIC_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_AWS_REGION=your_aws_region  # Must match backend deployment region
+NEXT_PUBLIC_USER_POOL_ID=your_user_pool_id
+NEXT_PUBLIC_SIGNUP_CLIENT_ID=your_signup_client_id
+NEXT_PUBLIC_LOGIN_CLIENT_ID=your_login_client_id
 ```
 
 #### Step 3: Install Dependencies
@@ -270,7 +270,7 @@ http://localhost:3000
 #### Backend Configuration
 ```env
 # AWS Configuration
-AWS_REGION=eu-west-1
+AWS_REGION=your_aws_region  # e.g., 'eu-west-1', 'us-east-1', 'ap-south-1'
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 
@@ -279,7 +279,7 @@ SENDZEN_API_URL=https://api.sendzen.com/v1/messages
 SENDZEN_API_KEY=your_sendzen_api_key
 WHATSAPP_FROM=your_whatsapp_business_number
 WHATSAPP_TEMPLATE_NAME=your_template_name
-WHATSAPP_LANG_CODE=en
+WHATSAPP_LANG_CODE=your_template_language_code  # e.g., 'en_US', etc.
 
 # Application Settings
 OTP_EXPIRY_MINUTES=5
@@ -289,10 +289,10 @@ MAX_LOGIN_ATTEMPTS=3
 #### Frontend Configuration
 ```env
 # AWS Cognito
-NEXT_PUBLIC_AWS_REGION=eu-west-1
+NEXT_PUBLIC_AWS_REGION=your_aws_region  # Must match backend deployment region
 NEXT_PUBLIC_USER_POOL_ID=your_user_pool_id
-NEXT_PUBLIC_CLIENT_ID=your_client_id
-NEXT_PUBLIC_CLIENT_SECRET=your_client_secret
+NEXT_PUBLIC_SIGNUP_CLIENT_ID=your_signup_client_id
+NEXT_PUBLIC_LOGIN_CLIENT_ID=your_login_client_id
 ```
 
 ### AWS Cognito Setup
@@ -309,9 +309,15 @@ Each implementation requires specific Cognito configuration:
 #### User Pool Attributes
 - `phone_number` (required)
 - `email` (required for WhatsApp + Email)
-- `email_verified` (required  attribute for dual auth)
+- `email_verified` (required attribute for dual auth)
 - `custom:auth_purpose` (custom attribute)
 - `custom:whatsapp_verified` (custom attribute)
+
+#### User Pool Clients
+- **Signup Client**: `WhatsApp-otp-signup-{stage}`
+- **Login Client**: `WhatsApp-otp-login-{stage}`
+- **Auth Flows**: Custom authentication enabled
+- **Secret Generation**: Disabled for simplicity
 
 ## 📱 Features
 
@@ -444,12 +450,29 @@ dotnet publish -c Release
    - AWS credentials
    - Cognito User Pool settings
 
+## 📊 Architecture Diagrams
+
+Each implementation includes comprehensive PlantUML diagrams:
+
+### WhatsApp Only Authentication
+- **Complete Architecture Diagram**: Shows complete backend architecture with all components
+- **Authentication Flow Sequence**: Step-by-step authentication flow
+- **Infrastructure Components**: AWS infrastructure components and relationships
+- **Deployment Architecture**: Serverless deployment structure
+
+### WhatsApp + Email Authentication
+- **Dual-Channel Flow**: Shows both WhatsApp and email verification flows
+- **Enhanced Security**: Multi-step verification process
+- **Backup Authentication**: Alternative verification methods
+
+
 ## 📚 Documentation
 
 Each implementation includes detailed documentation:
 
 - **Backend README**: Lambda functions, deployment, configuration
 - **Frontend README**: UI components, authentication flow, deployment
+- **Installation Guides**: Step-by-step setup instructions
 - **API Documentation**: Authentication service methods
 - **Deployment Guides**: Platform-specific deployment instructions
 
