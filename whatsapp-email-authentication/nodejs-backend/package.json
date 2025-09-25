@@ -1,0 +1,55 @@
+{
+  "name": "cognito-custom-auth-handler",
+  "version": "1.0.0",
+  "description": "AWS Cognito Custom Authentication with WhatsApp OTP using SendZen API",
+  "main": "lambda-functions.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f",
+    "offline": "serverless offline",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "aws",
+    "cognito",
+    "custom-auth",
+    "whatsapp",
+    "otp",
+    "passwordless",
+    "serverless",
+    "lambda"
+  ],
+  "author": "Sendzen",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.450.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
+    "@types/node": "^20.10.0",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "serverless": "^3.38.0",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-esbuild": "^1.50.0",
+    "serverless-offline": "^13.3.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sendzen-io/cognito-custom-auth-handler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/cognito-custom-auth-handler/issues"
+  },
+  "homepage": "https://github.com/yourusername/cognito-custom-auth-handler#readme"
+}

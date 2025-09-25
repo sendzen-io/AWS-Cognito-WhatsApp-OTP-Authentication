@@ -1,0 +1,84 @@
+@startuml WhatsApp OTP Authentication Flow
+
+!theme aws-orange
+title WhatsApp OTP Authentication Sequence
+
+actor User
+participant Frontend as "Next.js Frontend"
+participant Cognito as "AWS Cognito"
+participant Lambda as "Lambda Functions"
+participant SendZen as "SendZen API"
+
+== Signup Flow ==
+
+User -> Frontend: Enter phone + password
+Frontend -> Cognito: SignUp(phone, password)
+Cognito -> Lambda: PreSignUp Trigger
+Lambda -> Lambda: Auto-confirm user
+Lambda -> Cognito: User confirmed
+
+Cognito -> Frontend: SignUp success
+Frontend -> Cognito: InitiateAuth(CUSTOM_AUTH)
+
+Cognito -> Lambda: DefineAuthChallenge
+Lambda -> Lambda: Check user state
+Lambda -> Cognito: Return CUSTOM_CHALLENGE
+
+Cognito -> Lambda: CreateAuthChallenge
+Lambda -> Lambda: Generate OTP
+Lambda -> SendZen: Send WhatsApp OTP
+SendZen -> User: Deliver OTP via WhatsApp
+Lambda -> Cognito: Return challenge
+
+Cognito -> Frontend: CUSTOM_CHALLENGE
+Frontend -> User: Show OTP input
+
+User -> Frontend: Enter OTP
+Frontend -> Cognito: RespondToAuthChallenge(OTP)
+
+Cognito -> Lambda: VerifyAuthChallenge
+Lambda -> Lambda: Validate OTP
+
+alt OTP Valid
+    Lambda -> Cognito: Update user attributes
+    Cognito -> Frontend: Authentication tokens
+    Frontend -> User: Registration complete
+else OTP Invalid
+    Lambda -> Cognito: Challenge failed
+    Cognito -> Frontend: Retry challenge
+end
+
+== Login Flow ==
+
+User -> Frontend: Enter phone number
+Frontend -> Cognito: InitiateAuth(CUSTOM_AUTH)
+
+Cognito -> Lambda: DefineAuthChallenge
+Lambda -> Lambda: Check user confirmed & verified
+Lambda -> Cognito: Return CUSTOM_CHALLENGE
+
+Cognito -> Lambda: CreateAuthChallenge
+Lambda -> Lambda: Generate OTP
+Lambda -> SendZen: Send WhatsApp OTP
+SendZen -> User: Deliver OTP via WhatsApp
+Lambda -> Cognito: Return challenge
+
+Cognito -> Frontend: CUSTOM_CHALLENGE
+Frontend -> User: Show OTP input
+
+User -> Frontend: Enter OTP
+Frontend -> Cognito: RespondToAuthChallenge(OTP)
+
+Cognito -> Lambda: VerifyAuthChallenge
+Lambda -> Lambda: Validate OTP
+
+alt OTP Valid
+    Lambda -> Cognito: Authentication success
+    Cognito -> Frontend: JWT tokens
+    Frontend -> User: Login successful
+else OTP Invalid
+    Lambda -> Cognito: Challenge failed
+    Cognito -> Frontend: Authentication failed
+end
+
+@enduml

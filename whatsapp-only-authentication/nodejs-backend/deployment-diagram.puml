@@ -1,0 +1,165 @@
+@startuml Serverless Deployment Architecture
+
+!theme aws-orange
+title AWS Serverless Deployment Architecture
+
+package "AWS Account" {
+    
+    package "AWS Region (eu-west-1)" {
+        
+        package "AWS Cognito" {
+            node [User Pool] as UP {
+                WhatsApp-otp-auth-pool-dev
+            }
+            
+            node [Signup Client] as UPC1 {
+                WhatsApp-otp-signup-dev
+            }
+            
+            node [Login Client] as UPC2 {
+                WhatsApp-otp-login-dev
+            }
+        }
+        
+        package "AWS Lambda" {
+            node [PreSignUp Function] as PreSignUp {
+                cognito-sendzenOTP-auth-dev-preSignUp
+            }
+            
+            node [DefineAuthChallenge Function] as DefineAuth {
+                cognito-sendzenOTP-auth-dev-defineAuthChallenge
+            }
+            
+            node [CreateAuthChallenge Function] as CreateAuth {
+                cognito-sendzenOTP-auth-dev-createAuthChallenge
+            }
+            
+            node [VerifyAuthChallenge Function] as VerifyAuth {
+                cognito-sendzenOTP-auth-dev-verifyAuthChallenge
+            }
+            
+            node [PostConfirmation Function] as PostConfirmation {
+                cognito-sendzenOTP-auth-dev-postConfirmation
+            }
+        }
+        
+        package "AWS CloudWatch" {
+            node [Log Group 1] as Log1 {
+                /aws/lambda/preSignUp
+            }
+            
+            node [Log Group 2] as Log2 {
+                /aws/lambda/defineAuthChallenge
+            }
+            
+            node [Log Group 3] as Log3 {
+                /aws/lambda/createAuthChallenge
+            }
+            
+            node [Log Group 4] as Log4 {
+                /aws/lambda/verifyAuthChallenge
+            }
+            
+            node [Log Group 5] as Log5 {
+                /aws/lambda/postConfirmation
+            }
+        }
+        
+        package "AWS IAM" {
+            node [Execution Role] as IAM {
+                cognito-sendzenOTP-auth-dev-eu-west-1-lambdaRole
+            }
+        }
+        
+        package "AWS CloudFormation" {
+            node [Stack] as CF {
+                cognito-sendzenOTP-auth-dev
+            }
+        }
+    }
+}
+
+package "External Services" {
+    node [SendZen API] as SendZen {
+        api.sendzen.com
+    }
+}
+
+package "Client Environment" {
+    node [Developer Machine] as Dev {
+        Node.js 18+
+        Serverless Framework
+        AWS CLI
+    }
+    
+    node [User Device] as User {
+        Web Browser
+        WhatsApp App
+    }
+}
+
+' Deployment Flow
+Dev --> CF : serverless deploy
+CF --> UP : Create User Pool
+CF --> UPC1 : Create Signup Client
+CF --> UPC2 : Create Login Client
+CF --> PreSignUp : Deploy Lambda Function
+CF --> DefineAuth : Deploy Lambda Function
+CF --> CreateAuth : Deploy Lambda Function
+CF --> VerifyAuth : Deploy Lambda Function
+CF --> PostConfirmation : Deploy Lambda Function
+CF --> IAM : Create Execution Role
+CF --> Log1 : Create Log Groups
+CF --> Log2 : Create Log Groups
+CF --> Log3 : Create Log Groups
+CF --> Log4 : Create Log Groups
+CF --> Log5 : Create Log Groups
+
+' Runtime Connections
+UP --> PreSignUp : PreSignUp Trigger
+UP --> DefineAuth : DefineAuthChallenge Trigger
+UP --> CreateAuth : CreateAuthChallenge Trigger
+UP --> VerifyAuth : VerifyAuthChallenge Trigger
+UP --> PostConfirmation : PostConfirmation Trigger
+
+CreateAuth --> SendZen : Send WhatsApp OTP
+SendZen --> User : Deliver OTP
+
+PreSignUp --> Log1 : Write logs
+DefineAuth --> Log2 : Write logs
+CreateAuth --> Log3 : Write logs
+VerifyAuth --> Log4 : Write logs
+PostConfirmation --> Log5 : Write logs
+
+PreSignUp --> IAM : Use permissions
+DefineAuth --> IAM : Use permissions
+CreateAuth --> IAM : Use permissions
+VerifyAuth --> IAM : Use permissions
+PostConfirmation --> IAM : Use permissions
+
+note right of CF
+CloudFormation Stack:
+- Service: cognito-sendzenOTP-auth
+- Stage: dev/prod
+- Region: eu-west-1
+- Resources: 15+ AWS resources
+end note
+
+note right of IAM
+IAM Execution Role:
+- cognito-idp:* permissions
+- lambda:InvokeFunction
+- logs:CreateLogGroup
+- logs:CreateLogStream
+- logs:PutLogEvents
+end note
+
+note right of SendZen
+SendZen Configuration:
+- API URL: https://api.sendzen.com/v1/messages
+- Template-based messages
+- E.164 phone number format
+- Multi-language support
+end note
+
+@enduml

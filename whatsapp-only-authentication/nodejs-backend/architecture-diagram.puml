@@ -1,0 +1,160 @@
+@startuml AWS Cognito WhatsApp OTP Backend Architecture
+
+!theme aws-orange
+title AWS Cognito WhatsApp OTP Authentication Backend
+
+' Define participants
+actor User as "User"
+participant Frontend as "Next.js Frontend"
+participant Cognito as "AWS Cognito\nUser Pool"
+participant Lambda as "Lambda Functions"
+participant SendZen as "SendZen\nWhatsApp API"
+database CloudWatch as "CloudWatch\nLogs"
+
+' Define components
+package "AWS Infrastructure" {
+    component [User Pool] as UP
+    component [Signup Client] as UPC1
+    component [Login Client] as UPC2
+    component [PreSignUp Lambda] as PreSignUp
+    component [DefineAuthChallenge Lambda] as DefineAuth
+    component [CreateAuthChallenge Lambda] as CreateAuth
+    component [VerifyAuthChallenge Lambda] as VerifyAuth
+    component [PostConfirmation Lambda] as PostConfirmation
+}
+
+' Signup Flow
+== User Registration Flow ==
+
+User -> Frontend: 1. Enter phone + password
+Frontend -> Cognito: 2. SignUp API call
+note right: Username: phone_number\nPassword: user_password\nCustom attributes set
+
+Cognito -> PreSignUp: 3. PreSignUp Trigger
+PreSignUp -> PreSignUp: 4. Auto-confirm user
+PreSignUp -> PreSignUp: 5. Set auth_purpose = "signup_whatsapp_verify"
+PreSignUp -> Cognito: 6. Return auto-confirmed user
+
+Cognito -> Frontend: 7. SignUp success response
+Frontend -> Cognito: 8. InitiateAuth (CUSTOM_AUTH)
+note right: Trigger custom auth flow\nfor WhatsApp verification
+
+Cognito -> DefineAuth: 9. DefineAuthChallenge Trigger
+DefineAuth -> DefineAuth: 10. Check user state
+note right: auth_purpose = "signup_whatsapp_verify"\nwhatsapp_verified = false
+
+DefineAuth -> Cognito: 11. Return CUSTOM_CHALLENGE
+Cognito -> CreateAuth: 12. CreateAuthChallenge Trigger
+
+CreateAuth -> CreateAuth: 13. Generate 6-digit OTP
+CreateAuth -> SendZen: 14. Send WhatsApp OTP
+note right: Template message with OTP\nE.164 phone number format
+
+SendZen -> User: 15. WhatsApp OTP delivered
+CreateAuth -> Cognito: 16. Return challenge with OTP
+
+Cognito -> Frontend: 17. CUSTOM_CHALLENGE response
+Frontend -> User: 18. Show OTP input form
+
+User -> Frontend: 19. Enter OTP code
+Frontend -> Cognito: 20. RespondToAuthChallenge
+note right: ANSWER: user_entered_otp
+
+Cognito -> VerifyAuth: 21. VerifyAuthChallenge Trigger
+VerifyAuth -> VerifyAuth: 22. Validate OTP
+note right: Compare with stored OTP\nCheck expiry time
+
+alt OTP Valid
+    VerifyAuth -> Cognito: 23. Update user attributes
+    note right: whatsapp_verified = true\nphone_number_verified = true\nauth_purpose = ""
+    Cognito -> Frontend: 24. Authentication tokens
+    Frontend -> User: 25. Registration complete
+else OTP Invalid
+    VerifyAuth -> Cognito: 26. Challenge failed
+    Cognito -> Frontend: 27. Retry challenge
+    Frontend -> User: 28. Show error, retry
+end
+
+' Login Flow
+== User Login Flow ==
+
+User -> Frontend: 29. Enter phone number
+Frontend -> Cognito: 30. InitiateAuth (CUSTOM_AUTH)
+
+Cognito -> DefineAuth: 31. DefineAuthChallenge Trigger
+DefineAuth -> DefineAuth: 32. Check user state
+note right: User confirmed = true\nwhatsapp_verified = true
+
+DefineAuth -> Cognito: 33. Return CUSTOM_CHALLENGE
+Cognito -> CreateAuth: 34. CreateAuthChallenge Trigger
+
+CreateAuth -> CreateAuth: 35. Generate new OTP
+CreateAuth -> SendZen: 36. Send WhatsApp OTP
+SendZen -> User: 37. WhatsApp OTP delivered
+
+CreateAuth -> Cognito: 38. Return challenge with OTP
+Cognito -> Frontend: 39. CUSTOM_CHALLENGE response
+
+User -> Frontend: 40. Enter OTP code
+Frontend -> Cognito: 41. RespondToAuthChallenge
+
+Cognito -> VerifyAuth: 42. VerifyAuthChallenge Trigger
+VerifyAuth -> VerifyAuth: 43. Validate OTP
+
+alt OTP Valid
+    VerifyAuth -> Cognito: 44. Authentication success
+    Cognito -> Frontend: 45. JWT tokens (Access, ID, Refresh)
+    Frontend -> User: 46. Login successful, redirect to dashboard
+else OTP Invalid
+    VerifyAuth -> Cognito: 47. Challenge failed
+    Cognito -> Frontend: 48. Retry or fail after 3 attempts
+end
+
+' Error Handling and Logging
+== Error Handling ==
+
+Lambda -> CloudWatch: Log all operations
+note right: Function execution logs\nError details\nPerformance metrics
+
+alt SendZen API Error
+    CreateAuth -> CloudWatch: Log WhatsApp API error
+    CreateAuth -> Cognito: Fail authentication
+    Cognito -> Frontend: Error response
+end
+
+alt Invalid Phone Format
+    CreateAuth -> CloudWatch: Log phone validation error
+    CreateAuth -> Cognito: Fail authentication
+end
+
+' Infrastructure Components
+== Infrastructure Overview ==
+
+note over UP, UPC2
+AWS Cognito User Pool Configuration:
+- Username: phone_number
+- Custom attributes: whatsapp_verified, auth_purpose
+- Password policy: 8+ chars, complexity required
+- MFA: OFF (using custom auth)
+- Lambda triggers configured
+- Two clients: Signup and Login
+end note
+
+note over PreSignUp, PostConfirmation
+Lambda Functions:
+- PreSignUp: Auto-confirm users
+- DefineAuthChallenge: Determine auth flow
+- CreateAuthChallenge: Generate & send OTP
+- VerifyAuthChallenge: Validate OTP
+- PostConfirmation: Post-signup setup
+end note
+
+note over SendZen
+SendZen WhatsApp API:
+- Template-based messages
+- E.164 phone number format
+- Multi-language support
+- Rate limiting protection
+end note
+
+@enduml

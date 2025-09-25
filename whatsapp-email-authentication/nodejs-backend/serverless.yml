@@ -1,0 +1,203 @@
+service: email-phone-otp-auth-handler
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+
+    SENDZEN_API_URL: ${env:SENDZEN_API_URL}
+    SENDZEN_API_KEY: ${env:SENDZEN_API_KEY}
+    WHATSAPP_FROM: ${env:WHATSAPP_FROM}
+    OTP_EXPIRY_MINUTES: ${env:OTP_EXPIRY_MINUTES, '5'}
+    MAX_LOGIN_ATTEMPTS: ${env:MAX_LOGIN_ATTEMPTS, '3'}
+    NODE_ENV: ${env:NODE_ENV, 'development'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    WHATSAPP_TEMPLATE_NAME: ${env:WHATSAPP_TEMPLATE_NAME, 'otp_1'}
+    WHATSAPP_LANG_CODE: ${env:WHATSAPP_LANG_CODE, 'en_US'}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:*
+        - lambda:InvokeFunction
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+
+functions:
+  # TypeScript handlers. Each file must export handler
+  preSignUp:
+    handler: src/preSignUp.handler
+
+  defineAuthChallenge:
+    handler: src/defineAuthChallenge.handler
+
+  createAuthChallenge:
+    handler: src/createAuthChallenge.handler
+
+  verifyAuthChallenge:
+    handler: src/verifyAuthChallenge.handler
+
+  postConfirmation:
+    handler: src/postConfirmation.handler
+
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:custom.userPoolName}
+        Schema:
+          - Name: email
+            AttributeDataType: String
+            Mutable: true
+            Required: true
+          - Name: phone_number
+            AttributeDataType: String
+            Mutable: true
+            Required: true
+          - Name: whatsapp_verified
+            AttributeDataType: String
+            Mutable: true
+          - Name: auth_purpose
+            AttributeDataType: String
+            Mutable: true
+        UsernameAttributes:
+          - phone_number
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+            RequireUppercase: true
+        MfaConfiguration: "OFF"
+        # Email configuration for sending verification codes
+        EmailConfiguration:
+          EmailSendingAccount: COGNITO_DEFAULT
+        # Enable email verification
+        AutoVerifiedAttributes:
+          - email
+        # Email verification message template
+        VerificationMessageTemplate:
+          DefaultEmailOption: CONFIRM_WITH_CODE
+          EmailMessage: "Your verification code is {####}"
+          EmailSubject: "Your verification code"
+        LambdaConfig:
+          PreSignUp: !GetAtt PreSignUpLambdaFunction.Arn
+          DefineAuthChallenge: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+          CreateAuthChallenge: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+          VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+          PostConfirmation: !GetAtt PostConfirmationLambdaFunction.Arn
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: email-phone-otp-auth-client-${self:provider.stage}
+        UserPoolId: !Ref CognitoUserPool
+        GenerateSecret: true
+        EnableTokenRevocation: true
+        PreventUserExistenceErrors: ENABLED
+        ExplicitAuthFlows:
+          - ALLOW_CUSTOM_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
+
+    PreSignUpPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt PreSignUpLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    DefineAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    CreateAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    VerifyAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    PostConfirmationPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: !GetAtt PostConfirmationLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+  Outputs:
+    UserPoolId:
+      Description: Cognito User Pool ID
+      Value: !Ref CognitoUserPool
+      Export:
+        Name: ${self:service}-${self:provider.stage}-UserPoolId
+
+    UserPoolClientId:
+      Description: Cognito User Pool Client ID
+      Value: !Ref CognitoUserPoolClient
+      Export:
+        Name: ${self:service}-${self:provider.stage}-UserPoolClientId
+
+    UserPoolClientSecret:
+      Description: Cognito User Pool Client Secret
+      Value: !GetAtt CognitoUserPoolClient.ClientSecret
+      Export:
+        Name: ${self:service}-${self:provider.stage}-UserPoolClientSecret
+
+plugins:
+  - serverless-esbuild
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+custom:
+  userPoolName: email-phone-otp-auth-pool-${self:provider.stage}
+
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: ['aws-sdk']
+    target: 'node18'
+    external: []
+    metafile: false
+    define:
+      'require.resolve': undefined
+    platform: 'node'
+
+  serverless-offline:
+    httpPort: 3000
+  dotenv:
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION

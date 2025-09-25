@@ -1,0 +1,146 @@
+@startuml Backend Infrastructure Components
+
+!theme aws-orange
+title AWS Cognito WhatsApp OTP Backend Infrastructure
+
+package "AWS Cloud" {
+    
+    package "AWS Cognito" {
+        component [User Pool] as UP {
+            [Phone Number Attribute]
+            [Custom Attributes]
+            [Password Policy]
+            [Lambda Triggers]
+        }
+        
+        component [Signup Client] as UPC1 {
+            [Signup Client ID]
+            [Custom Auth Flow]
+        }
+        
+        component [Login Client] as UPC2 {
+            [Login Client ID]
+            [Custom Auth Flow]
+        }
+    }
+    
+    package "AWS Lambda Functions" {
+        component [PreSignUp] as PreSignUp {
+            [Auto-confirm users]
+            [Set custom attributes]
+        }
+        
+        component [DefineAuthChallenge] as DefineAuth {
+            [Determine auth flow]
+            [Check user state]
+            [Return challenge type]
+        }
+        
+        component [CreateAuthChallenge] as CreateAuth {
+            [Generate OTP]
+            [Send WhatsApp message]
+            [Store challenge data]
+        }
+        
+        component [VerifyAuthChallenge] as VerifyAuth {
+            [Validate OTP]
+            [Update user attributes]
+            [Return success/failure]
+        }
+        
+        component [PostConfirmation] as PostConfirmation {
+            [Post-signup setup]
+            [Additional processing]
+        }
+    }
+    
+    package "AWS CloudWatch" {
+        component [Log Groups] as Logs {
+            [Function execution logs]
+            [Error tracking]
+            [Performance metrics]
+        }
+    }
+    
+    package "AWS IAM" {
+        component [Execution Role] as IAM {
+            [Lambda permissions]
+            [Cognito permissions]
+            [CloudWatch permissions]
+        }
+    }
+}
+
+package "External Services" {
+    component [SendZen API] as SendZen {
+        [WhatsApp Business API]
+        [Template messages]
+        [Message delivery]
+    }
+}
+
+package "Client Application" {
+    component [Next.js Frontend] as Frontend {
+        [Signup Form]
+        [Login Form]
+        [OTP Verification]
+        [Dashboard]
+    }
+}
+
+' Connections
+Frontend --> UP : SignUp/InitiateAuth
+Frontend --> UPC1 : Signup Authentication
+Frontend --> UPC2 : Login Authentication
+UP --> PreSignUp : PreSignUp Trigger
+UP --> DefineAuth : DefineAuthChallenge Trigger
+UP --> CreateAuth : CreateAuthChallenge Trigger
+UP --> VerifyAuth : VerifyAuthChallenge Trigger
+UP --> PostConfirmation : PostConfirmation Trigger
+
+CreateAuth --> SendZen : Send WhatsApp OTP
+SendZen --> Frontend : OTP delivered to user
+
+PreSignUp --> Logs : Log operations
+DefineAuth --> Logs : Log operations
+CreateAuth --> Logs : Log operations
+VerifyAuth --> Logs : Log operations
+PostConfirmation --> Logs : Log operations
+
+PreSignUp --> IAM : Use permissions
+DefineAuth --> IAM : Use permissions
+CreateAuth --> IAM : Use permissions
+VerifyAuth --> IAM : Use permissions
+PostConfirmation --> IAM : Use permissions
+
+note right of UP
+User Pool Configuration:
+- Username: phone_number
+- Custom attributes: whatsapp_verified, auth_purpose
+- Password policy: 8+ characters, complexity
+- MFA: OFF (custom auth instead)
+end note
+
+note right of UPC1
+Signup Client:
+- Generate Secret: false
+- Auth Flows: CUSTOM_AUTH enabled
+- Explicit Auth Flows configured
+end note
+
+note right of UPC2
+Login Client:
+- Generate Secret: false
+- Auth Flows: CUSTOM_AUTH enabled
+- Explicit Auth Flows configured
+end note
+
+note right of SendZen
+SendZen WhatsApp API:
+- Template-based messages
+- E.164 phone number format
+- Multi-language support
+- Rate limiting protection
+end note
+
+@enduml
