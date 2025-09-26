@@ -2,7 +2,7 @@
 
 This guide provides step-by-step instructions for installing and running the WhatsApp-Email Authentication React frontend application.
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### System Requirements
 - **Node.js**: Version 18.0.0 or higher
@@ -20,7 +20,7 @@ This guide provides step-by-step instructions for installing and running the Wha
 - **React Developer Tools**: Browser extension
 - **ESLint Extension**: For code quality
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### Step 1: System Setup
 
@@ -113,7 +113,7 @@ npm run build
 npm run preview
 ```
 
-## 🔧 Configuration Details
+## Configuration Details
 
 ### Environment Variables
 
@@ -153,7 +153,7 @@ const amplifyConfig = {
 };
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Development Testing
 ```bash
@@ -207,7 +207,7 @@ Test on mobile devices:
 - Responsive design
 - Touch interactions
 
-## 🚀 Deployment
+## Deployment
 
 ### Build Process
 ```bash
@@ -257,7 +257,7 @@ NODE_ENV=development npm run build
 NODE_ENV=production npm run build
 ```
 
-## 🔧 Customization
+## Customization
 
 ### Styling Customization
 Modify `src/App.css` for custom styling:
@@ -294,7 +294,7 @@ Environment-based configuration:
 // Feature flags
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -347,7 +347,7 @@ Use browser developer tools for debugging:
 - **Application**: Check localStorage and sessionStorage
 - **Elements**: Inspect DOM structure
 
-## 📊 Performance Optimization
+## Performance Optimization
 
 ### Build Optimization
 ```bash
@@ -370,7 +370,7 @@ npm run build -- --report
 - **Bundle Analyzer**: Analyze bundle size
 - **Network Monitoring**: Monitor API performance
 
-## 🔐 Security Considerations
+## Security Considerations
 
 ### Environment Variables
 - Never commit `.env` files
@@ -390,7 +390,7 @@ Add CSP headers for production:
 - Sanitize all user inputs
 - Prevent XSS attacks
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Documentation
 - [React Documentation](https://react.dev/)
@@ -409,7 +409,7 @@ Add CSP headers for production:
 - AWS Support (if you have a support plan)
 - GitHub Issues
 
-## 🔄 Updates and Maintenance
+## Updates and Maintenance
 
 ### Updating Dependencies
 ```bash

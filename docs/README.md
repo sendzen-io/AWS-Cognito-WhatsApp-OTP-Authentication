@@ -2,7 +2,7 @@
 
 This directory contains comprehensive documentation and auto-generated system diagrams that visualize the AWS Cognito WhatsApp OTP Authentication system architecture, components, and flows.
 
-## 📊 Available Diagrams
+## Available Diagrams
 
 ### WhatsApp Only Authentication
 
@@ -96,7 +96,7 @@ This directory contains comprehensive documentation and auto-generated system di
 - **Best for**: Understanding the enhanced deployment
 - **Use cases**: Deployment planning, environment management, security configuration
 
-## 🖼️ How to View These Diagrams
+## How to View These Diagrams
 
 ### 1. **GitHub/GitLab (Recommended)**
 - **Automatic Rendering**: GitHub and GitLab automatically render SVG diagrams
@@ -142,7 +142,7 @@ mmdc -i diagram.mmd -o diagram.png
 mmdc -i diagram.mmd -o diagram.svg
 ```
 
-## 🔄 Auto-Generation Process
+## Auto-Generation Process
 
 ### How It Works
 1. **Source Files**: PlantUML source files (`.puml`) are maintained in backend directories
@@ -161,7 +161,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **Output**: SVG files with consistent naming convention
 - **Validation**: Automatic validation of PlantUML syntax
 
-## 📝 Contributing to Diagrams
+## Contributing to Diagrams
 
 ### Updating Existing Diagrams
 1. **Edit Source**: Modify the corresponding `.puml` file in the backend directory
@@ -184,7 +184,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **Version Control**: Keep source files in version control
 - **Documentation**: Always document what each diagram shows
 
-## 🎯 Diagram Usage Guidelines
+## Diagram Usage Guidelines
 
 ### For Developers
 - **Architecture Understanding**: Use architecture diagrams to understand system design
@@ -210,7 +210,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **Infrastructure Investment**: Use component diagrams to understand infrastructure needs
 - **Security Compliance**: Use security diagrams to understand security measures
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### PlantUML Resources
 - [PlantUML Documentation](https://plantuml.com/)
@@ -228,7 +228,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/)
 - [AWS Architecture Center](https://aws.amazon.com/architecture/)
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 1. **Diagrams Not Rendering**: Check PlantUML syntax and file format
@@ -242,7 +242,7 @@ mmdc -i diagram.mmd -o diagram.svg
 3. **Check Workflow**: Verify GitHub Actions workflow is configured correctly
 4. **Review Logs**: Check GitHub Actions logs for errors
 
-## 📞 Support
+## Support
 
 For diagram-related issues:
 - Check PlantUML documentation

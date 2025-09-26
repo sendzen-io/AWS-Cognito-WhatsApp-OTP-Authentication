@@ -2,14 +2,14 @@
 
 This guide will walk you through setting up and deploying the AWS Cognito WhatsApp OTP Authentication backend.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js 18+** installed
 - **AWS CLI** configured with appropriate permissions
 - **SendZen API** account and credentials
 - **AWS Account** with Cognito, Lambda, and IAM access
 
-## 🚀 Step-by-Step Installation
+## Step-by-Step Installation
 
 ### Step 1: Navigate to Backend Directory
 ```bash
@@ -75,7 +75,7 @@ LoginClientId: xxxxxxxxxxxxxxxxxxxxxxxxxx
 
 **Save these values** - you'll need them for the frontend configuration.
 
-## 🔍 Verification
+## Verification
 
 ### Check AWS Console
 1. **Lambda Functions**: Go to AWS Lambda console and verify 5 functions are created:
@@ -92,7 +92,7 @@ LoginClientId: xxxxxxxxxxxxxxxxxxxxxxxxxx
 
 3. **CloudWatch Logs**: Check for any deployment errors in CloudWatch logs
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -124,14 +124,14 @@ aws sts get-caller-identity
 aws lambda list-functions
 ```
 
-## 🧹 Cleanup
+## Cleanup
 
 To remove all deployed resources:
 ```bash
 serverless remove --stage dev
 ```
 
-## 📚 Next Steps
+## Next Steps
 
 After successful backend deployment:
 1. Note the UserPoolId, UserPoolClientId, and UserPoolClientSecret

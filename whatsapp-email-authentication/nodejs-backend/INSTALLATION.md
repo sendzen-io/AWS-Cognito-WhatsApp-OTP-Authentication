@@ -2,7 +2,7 @@
 
 This guide provides step-by-step instructions for installing and deploying the WhatsApp-Email Authentication backend system.
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### System Requirements
 - **Node.js**: Version 18.0.0 or higher
@@ -24,7 +24,7 @@ This guide provides step-by-step instructions for installing and deploying the W
 - **SendZen Account**: For WhatsApp message delivery
 - **WhatsApp Business Account**: For sending messages
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### Step 1: System Setup
 
@@ -204,7 +204,7 @@ VITE_SIGNUP_CLIENT_ID=1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p
 VITE_LOGIN_CLIENT_ID=9z8y7x6w5v4u3t2s1r0q9p8o7n6m5l4k
 ```
 
-## 🔧 Configuration Details
+## Configuration Details
 
 ### AWS Cognito Configuration
 
@@ -289,7 +289,7 @@ VITE_LOGIN_CLIENT_ID=9z8y7x6w5v4u3t2s1r0q9p8o7n6m5l4k
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Local Testing
 ```bash
@@ -324,7 +324,7 @@ serverless invoke local --function preSignUp --data '{"request":{"userAttributes
    - Test WhatsApp OTP delivery
    - Complete authentication
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -371,7 +371,7 @@ serverless logs --stage dev
 aws logs describe-log-groups --log-group-name-prefix /aws/lambda
 ```
 
-## 🔄 Updates and Maintenance
+## Updates and Maintenance
 
 ### Updating Dependencies
 ```bash
@@ -403,7 +403,7 @@ serverless deploy list --stage dev
 serverless rollback --timestamp <timestamp> --stage dev
 ```
 
-## 📊 Monitoring
+## Monitoring
 
 ### CloudWatch Metrics
 - **Lambda Invocations**: Function call count
@@ -424,7 +424,7 @@ Set up CloudWatch alarms for:
 - Failed deployments
 - API rate limits
 
-## 🔐 Security Considerations
+## Security Considerations
 
 ### Environment Variables
 - Never commit `.env` files
@@ -444,7 +444,7 @@ Set up CloudWatch alarms for:
 - Implement proper logging and monitoring
 - Regular security audits
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Documentation
 - [AWS Cognito Documentation](https://docs.aws.amazon.com/cognito/)

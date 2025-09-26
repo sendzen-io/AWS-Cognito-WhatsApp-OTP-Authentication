@@ -1,55 +1,43 @@
 # WhatsApp-Email Authentication Frontend
 
-A modern React frontend application that provides a seamless user experience for WhatsApp-email authentication. Built with Vite, React 18, and AWS Amplify, this application handles both signup and login flows with comprehensive error handling and user feedback.
+A React frontend application for WhatsApp-email authentication. Built with Vite, React 18, and AWS Amplify, this application handles both signup and login flows with basic error handling and user feedback.
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
+### Authentication Features
 - **Dual Authentication Flow**: Signup and login with WhatsApp OTP
 - **Email Verification**: Integrated email confirmation step
 - **WhatsApp OTP**: Secure OTP delivery via WhatsApp
 - **Dual-Channel Verification**: WhatsApp OTP + Email confirmation
 - **Email-First Flow**: Email confirmation before WhatsApp verification
-- **Backup Authentication**: Multiple verification methods for enhanced security
 - **Flexible Login**: Login using either phone number or email
-- **Session Management**: Secure session handling with AWS Cognito
+- **Session Management**: Basic session handling with AWS Cognito
 
-### 🎨 Frontend Features
-- **Modern UI/UX**: Clean, intuitive interface with modern design patterns
-- **Real-time Validation**: Client-side form validation with immediate feedback
-- **Progressive Enhancement**: Mobile-first design with desktop optimization
-- **Accessibility**: WCAG 2.1 AA compliant interface
-- **Error Recovery**: Comprehensive error handling with user-friendly messages
+### Frontend Features
+- **Basic UI/UX**: Clean interface with basic design
+- **Form Validation**: Client-side form validation
+- **Responsive Design**: Basic responsive design for mobile and desktop
+- **Error Recovery**: Basic error handling with user messages
 - **Loading States**: Visual feedback during authentication processes
 
-### 📱 WhatsApp Integration Features
-- **OTP Delivery**: Secure OTP delivery via WhatsApp Business API
-- **Template Messages**: Pre-approved message templates for consistent branding
-- **Multi-Language Support**: Support for different languages and regions
-- **Error Handling**: Graceful API failure handling with retry mechanisms
-- **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
-- **Template Management**: Easy template configuration and updates
-- **Fallback Handling**: Alternative delivery methods when WhatsApp fails
+### WhatsApp Integration Features
+- **OTP Delivery**: OTP delivery via free Sendzen WhatsApp Business API
+- **Multi-Language Support**: Support for different template languages
+- **Error Handling**: Basic API failure handling
 
-### 📧 Email Integration Features
+### Email Integration Features
 - **Email Verification**: Built-in email verification process
-- **Email Templates**: Customizable email templates
-- **Delivery Tracking**: Email delivery monitoring
-- **Error Handling**: Graceful email failure handling
-- **Multi-Language Support**: Support for different languages
-- **Template Management**: Easy email template configuration
+- **Email Templates**: Basic email templates
+- **Error Handling**: Basic email failure handling
 
-### 🔒 Security Features
+### Security Features
 - **Input Validation**: E.164 phone number and email format validation
 - **XSS Protection**: Framework built-in XSS protection
 - **CSRF Protection**: AWS Cognito's built-in CSRF protection
 - **Secure Storage**: Proper token storage with automatic cleanup
-- **Audit Trail**: Comprehensive logging for security monitoring
-- **Rate Limiting**: Protection against brute force attacks
-- **Secret Hash**: HMAC-SHA256 for secure client-server communication
-- **Token Security**: Secure JWT token management with automatic expiration
+- **Token Security**: Basic JWT token management
 
-### 🏗️ Architecture Features
+### Architecture Features
 - **React 18**: Modern React with hooks and functional components
 - **Vite**: Fast build tool and development server
 - **AWS Amplify**: AWS SDK integration for Cognito
@@ -57,7 +45,7 @@ A modern React frontend application that provides a seamless user experience for
 - **ESLint**: Code quality and consistency
 - **TypeScript**: Type safety and better development experience
 
-## 🏗️ Architecture
+## Architecture
 
 ### Technology Stack
 - **React 18**: Modern React with hooks and functional components
@@ -67,6 +55,9 @@ A modern React frontend application that provides a seamless user experience for
 - **ESLint**: Code quality and consistency
 
 ### System Architecture
+
+<details>
+<summary>Click to expand system architecture diagram</summary>
 
 ```mermaid
 graph TB
@@ -109,6 +100,8 @@ graph TB
     UserPool --> Email
 ```
 
+</details>
+
 ### Component Structure
 ```
 src/
@@ -133,6 +126,9 @@ src/
 ```
 
 ### Component Interaction
+
+<details>
+<summary>Click to expand component interaction diagram</summary>
 
 ```mermaid
 graph LR
@@ -178,7 +174,9 @@ graph LR
     Validation --> ErrorDisplay
 ```
 
-## 🚀 Quick Start
+</details>
+
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
@@ -233,7 +231,7 @@ npm run build
 npm run preview
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### AWS Cognito Setup
 
@@ -251,7 +249,7 @@ npm run preview
 | `VITE_SIGNUP_CLIENT_ID` | Signup client ID | Yes | `1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p` |
 | `VITE_LOGIN_CLIENT_ID` | Login client ID | Yes | `9z8y7x6w5v4u3t2s1r0q9p8o7n6m5l4k` |
 
-## 🎨 User Interface
+## User Interface
 
 ### Design Principles
 - **Clean and Modern**: Minimalist design with focus on usability
@@ -272,7 +270,7 @@ npm run preview
 - **Input Labels**: Clear and descriptive
 - **Error Messages**: Prominent but not overwhelming
 
-## 🔄 Authentication Flows
+## Authentication Flows
 
 ### Signup Flow
 **Purpose**: Create new user accounts with dual-channel verification (Email + WhatsApp)
@@ -342,6 +340,9 @@ npm run preview
 
 ### User Experience Flow
 
+<details>
+<summary>Click to expand user experience flow diagram</summary>
+
 ```mermaid
 stateDiagram-v2
     [*] --> SignupPage
@@ -395,7 +396,9 @@ stateDiagram-v2
     }
 ```
 
-## 🛠️ Components
+</details>
+
+## Components
 
 ### Core Components
 
@@ -429,7 +432,7 @@ Error panel for displaying multiple errors or detailed error information.
 #### ErrorContext.jsx
 React context for managing application-wide error state and handling.
 
-## 🔐 Security Features
+## Security Features
 
 ### Input Validation
 - **Email**: RFC-compliant email validation
@@ -449,40 +452,19 @@ React context for managing application-wide error state and handling.
 - **Input Sanitization**: XSS protection
 - **CSRF Protection**: AWS Cognito built-in protection
 
-## 📱 Responsive Design
 
-### Breakpoints
-- **Mobile**: 320px - 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: 1024px+
-
-### Mobile Optimization
-- **Touch-friendly**: Large touch targets
-- **Swipe Gestures**: Natural mobile interactions
-- **Keyboard Handling**: Proper input types
-- **Viewport**: Optimized for mobile screens
-
-## 🎯 User Experience
+## User Experience
 
 ### Loading States
 - **Button Loading**: Disabled state with spinner
 - **Form Loading**: Overall form loading state
-- **Progress Indicators**: Step-by-step progress
-- **Skeleton Loading**: Content placeholders
 
 ### Error Recovery
-- **Retry Mechanisms**: Automatic retry for network errors
 - **Clear Instructions**: Step-by-step error resolution
 - **Help Text**: Contextual help and suggestions
-- **Fallback Options**: Alternative actions when possible
 
-### Accessibility
-- **Keyboard Navigation**: Full keyboard support
-- **Screen Readers**: ARIA labels and descriptions
-- **Color Contrast**: WCAG AA compliant
-- **Focus Management**: Clear focus indicators
 
-## 🧪 Testing
+## Testing
 
 ### Development Testing
 ```bash
@@ -497,11 +479,10 @@ npm audit
 - [ ] Signup flow completion
 - [ ] Login flow completion
 - [ ] Error handling scenarios
-- [ ] Mobile responsiveness
-- [ ] Accessibility compliance
+- [ ] Basic mobile responsiveness
 - [ ] Browser compatibility
 
-## 🚀 Deployment
+## Deployment
 
 ### Build Process
 ```bash
@@ -523,7 +504,7 @@ npm run preview
 - **Staging**: Production-like with debug
 - **Production**: Optimized, minified, compressed
 
-## 🔧 Customization
+## Customization
 
 ### Styling
 Modify `App.css` for custom styling:
@@ -546,22 +527,14 @@ Environment-based configuration:
 - Custom error messages
 - Feature flags
 
-## 📊 Performance
+## Performance
 
 ### Optimization Features
-- **Code Splitting**: Lazy loading of components
-- **Tree Shaking**: Unused code elimination
-- **Minification**: JavaScript and CSS minification
-- **Compression**: Gzip/Brotli compression
-- **Caching**: Browser and CDN caching
+- **Basic Minification**: JavaScript and CSS minification
+- **Basic Caching**: Browser caching
 
-### Performance Metrics
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Cumulative Layout Shift**: < 0.1
-- **First Input Delay**: < 100ms
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -591,7 +564,7 @@ Enable debug logging in browser console:
 localStorage.setItem('debug', 'true');
 ```
 
-## 📚 API Reference
+## API Reference
 
 ### Authentication Functions
 
@@ -624,11 +597,11 @@ Resends OTP for verification.
 - **Alternative Actions**: Fallback options
 - **Help Text**: Contextual assistance
 
-## 📊 System Diagrams
+## System Diagrams
 
 For comprehensive system diagrams including architecture, authentication flows, component interactions, and deployment architecture, see the [DIAGRAMS.md](../DIAGRAMS.md) file.
 
-### 🖼️ How to View Diagrams
+### How to View Diagrams
 
 The diagrams are written in **Mermaid** syntax. Here are quick ways to view them:
 
@@ -650,7 +623,7 @@ The diagrams are written in **Mermaid** syntax. Here are quick ways to view them
 - Copy diagram code from [DIAGRAMS.md](../DIAGRAMS.md)
 - Paste and view/export as PNG/SVG
 
-### 📋 Available Diagrams
+### Available Diagrams
 
 The diagrams include:
 - **System Architecture**: Overall system structure and component relationships
@@ -664,7 +637,7 @@ The diagrams include:
 - **Deployment Architecture**: CI/CD pipeline and deployment process
 - **Performance Monitoring**: Performance monitoring and optimization strategy
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Setup
 1. Fork the repository
@@ -681,11 +654,11 @@ The diagrams include:
 - **Error Handling**: Comprehensive error management
 - **Documentation**: Clear code comments
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
+## Support
 
 For support and questions:
 - Create an issue in the repository
@@ -693,7 +666,7 @@ For support and questions:
 - Review AWS Cognito documentation
 - Consult React and Vite documentation
 
-## 🔄 Version History
+## Version History
 
 - **v1.0.0**: Initial release with basic authentication
 - **v1.1.0**: Added comprehensive error handling

@@ -1,8 +1,8 @@
 # AWS Cognito WhatsApp OTP Authentication System
 
-A complete, production-ready serverless authentication system that uses AWS Cognito custom authentication flows with WhatsApp OTP verification via free SendZen API. This system provides secure phone number-based authentication without requiring email verification, making it perfect for mobile-first applications and international users.
+A comprehensive serverless authentication system that uses AWS Cognito custom authentication flows with WhatsApp OTP verification via free SendZen API. This system provides phone number-based authentication without email verification.
 
-## 🚀 Overview
+## Overview
 
 This authentication system implements a modern, secure, and user-friendly authentication flow using:
 
@@ -10,60 +10,47 @@ This authentication system implements a modern, secure, and user-friendly authen
 - **AWS Lambda Functions** for authentication logic
 - **SendZen WhatsApp API** for OTP delivery
 - **Next.js Frontend** with modern React components
-- **Serverless Architecture** for scalability and cost-effectiveness
+- **Serverless Architecture** using AWS Lambda
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
-- ✅ **Phone Number Authentication**: E.164 format phone number validation with real-time feedback
-- ✅ **WhatsApp OTP Delivery**: Secure OTP delivery via WhatsApp Business API
-- ✅ **Custom Authentication Flow**: Seamless integration with AWS Cognito triggers
+### Authentication Features
+- ✅ **Phone Number Authentication**: E.164 format phone number validation
+- ✅ **WhatsApp OTP Delivery**: OTP delivery via WhatsApp Business API
+- ✅ **Custom Authentication Flow**: AWS Cognito triggers
 - ✅ **Dual Client Architecture**: Separate clients for signup and login flows
-- ✅ **Session Management**: Robust session handling with automatic cleanup
-- ✅ **Error Handling**: Comprehensive error handling and user feedback
-- ✅ **Security**: Secret hash authentication and secure token management
-- ✅ **Rate Limiting**: Built-in protection against brute force attacks
-- ✅ **Auto-Confirmation**: Streamlined user onboarding process
+- ✅ **Session Management**: Basic session handling
+- ✅ **Error Handling**: Basic error handling and user feedback
+- ✅ **Auto-Confirmation**: Basic user onboarding process
 
-### 📱 WhatsApp Integration Features
-- ✅ **SendZen API Integration**: Reliable WhatsApp Business API for OTP delivery
-- ✅ **Template Messages**: Pre-approved message templates for consistent branding
-- ✅ **Multi-Language Support**: Support for different languages and regions
-- ✅ **Error Handling**: Graceful API failure handling with retry mechanisms
-- ✅ **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
-- ✅ **Template Management**: Easy template configuration and updates
-- ✅ **Fallback Handling**: Alternative delivery methods when WhatsApp fails
+### WhatsApp Integration Features
+- ✅ **SendZen API Integration**: WhatsApp Business API for OTP delivery
+- ✅ **Multi-Language Support**: Support for different template languages
 
-### 🏗️ Architecture Features
+### Architecture Features
 - ✅ **Serverless Architecture**: AWS Lambda functions for scalability and cost-effectiveness
 - ✅ **Cloud-Native**: Built on AWS services (Cognito, Lambda, CloudWatch)
-- ✅ **Microservices Design**: Modular Lambda functions for maintainability
-- ✅ **Infrastructure as Code**: Serverless Framework for automated deployment
-- ✅ **Monitoring & Logging**: CloudWatch integration for observability
-- ✅ **Auto-Scaling**: Automatic scaling based on demand
-- ✅ **High Availability**: Multi-AZ deployment for reliability
+- ✅ **Infrastructure as Code**: Serverless Framework for deployment
+- ✅ **Monitoring & Logging**: Basic CloudWatch integration
 
-### 🎨 Frontend Features
-- ✅ **Modern UI/UX**: Clean, intuitive interface with modern design patterns
-- ✅ **Real-time Validation**: Client-side form validation with immediate feedback
-- ✅ **Progressive Enhancement**: Mobile-first design with desktop optimization
-- ✅ **Accessibility**: WCAG 2.1 AA compliant interface
-- ✅ **Error Recovery**: Comprehensive error handling with user-friendly messages
+### Frontend Features
+- ✅ **Basic UI/UX**: Clean interface with basic design
+- ✅ **Form Validation**: Client-side form validation
+- ✅ **Error Recovery**: Basic error handling with user messages
 - ✅ **Loading States**: Visual feedback during authentication processes
-- ✅ **Responsive Design**: Works seamlessly on all device sizes
-- ✅ **Dark/Light Mode**: Ready for theme switching (configurable)
+- ✅ **Responsive Design**: Basic responsive design for mobile and desktop
 
-### 🔒 Security Features
+### Security Features
 - ✅ **Input Validation**: E.164 phone number format validation
 - ✅ **XSS Protection**: Framework built-in XSS protection
 - ✅ **CSRF Protection**: AWS Cognito's built-in CSRF protection
-- ✅ **Secure Storage**: Proper token storage with automatic cleanup
-- ✅ **Audit Trail**: Comprehensive logging for security monitoring
-- ✅ **Rate Limiting**: Protection against brute force attacks
-- ✅ **Secret Hash**: HMAC-SHA256 for secure client-server communication
-- ✅ **Token Security**: Secure JWT token management with automatic expiration
+- ✅ **Token Storage**: Basic token storage
+- ✅ **Token Security**: Basic JWT token management
 
-## 📁 Project Structure
+## Project Structure
+
+<details>
+<summary>Click to expand project structure</summary>
 
 ```
 whatsapp-only-authentication/
@@ -84,10 +71,12 @@ whatsapp-only-authentication/
 │   ├── README.md          # Frontend documentation
 │   └── INSTALLATION.md    # Frontend setup guide
 └── c#-backend/            # C# backend implementation (coming soon)
-    └── sample.txt
 ```
 
-## 🏗 Architecture Overview
+</details>
+
+
+## Architecture Overview
 
 ### Authentication Flow
 
@@ -262,7 +251,7 @@ The system implements a sophisticated authentication flow with two distinct phas
 - **Rate Limiting**: Protection against abuse
 - **CORS**: Proper cross-origin configuration
 
-## 📊 Architecture Diagrams
+## Architecture Diagrams
 
 The system includes comprehensive PlantUML diagrams that are automatically generated as SVG images:
 
@@ -280,7 +269,7 @@ The system includes comprehensive PlantUML diagrams that are automatically gener
 
 > **Note**: These diagrams are automatically generated from PlantUML source files (`.puml`) in the `nodejs-backend/` directory. When you edit any `.puml` file and push to GitHub, the GitHub Actions workflow will automatically regenerate the corresponding SVG images.
 
-## 🛠 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -337,7 +326,7 @@ npm run dev
 4. **Login**: Test login flow
 5. **Dashboard**: Verify token management
 
-## 🔧 Configuration
+## Configuration
 
 ### Backend Configuration
 
@@ -373,7 +362,7 @@ WHATSAPP_TEMPLATE_NAME=your_template_name
 WHATSAPP_LANG_CODE=your_template_language_code  # e.g., 'en_US', etc.
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Backend Deployment
 
@@ -401,7 +390,7 @@ vercel --prod
 amplify publish
 ```
 
-## 📱 Frontend Components
+## Frontend Components
 
 ### SignupForm
 - **Phone Number Validation**: E.164 format validation with real-time feedback
@@ -429,7 +418,7 @@ amplify publish
 - **User Information**: Display of user phone number and ID
 - **Secure Logout**: Complete session cleanup and token invalidation
 
-## 🔒 Security Features
+## Security Features
 
 ### Authentication Security
 - **Custom Authentication Flow**: Secure OTP-based authentication
@@ -450,7 +439,7 @@ amplify publish
 - **Secure Logout**: Complete session and token cleanup
 - **No Sensitive Logging**: Avoids logging sensitive authentication data
 
-## 📊 Monitoring and Logs
+## Monitoring and Logs
 
 ### CloudWatch Logs
 - Each Lambda function creates its own log group
@@ -469,7 +458,7 @@ serverless logs --function preSignUp --tail
 serverless logs
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -509,7 +498,7 @@ aws cognito-idp list-user-pools --max-items 10
 aws lambda list-functions
 ```
 
-## 🧹 Cleanup
+## Cleanup
 
 ### Remove All Resources
 ```bash
@@ -527,7 +516,7 @@ If automatic cleanup fails, manually remove:
 3. CloudWatch Log Groups
 4. IAM Roles and Policies
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - **IAM Permissions**: Use least privilege principle
 - **Environment Variables**: Never commit sensitive data to version control
@@ -535,11 +524,11 @@ If automatic cleanup fails, manually remove:
 - **Cognito Security**: User Pool configured with security best practices
 - **Secret Management**: Consider using AWS Secrets Manager for production
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -547,7 +536,7 @@ This project is licensed under the MIT License - see the [LICENSE](../../LICENSE
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📞 Support
+## Support
 
 For support and questions:
 - Check the AWS Cognito documentation

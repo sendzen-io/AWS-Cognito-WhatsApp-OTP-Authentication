@@ -2,13 +2,13 @@
 
 This guide will walk you through setting up and running the Next.js frontend for AWS Cognito WhatsApp OTP Authentication.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js 18+** installed
 - **Backend successfully deployed** (see backend INSTALLATION.md)
 - **Backend deployment outputs** (UserPoolId, ClientId, ClientSecret)
 
-## 🚀 Step-by-Step Installation
+## Step-by-Step Installation
 
 ### Step 1: Navigate to Frontend Directory
 ```bash
@@ -53,7 +53,7 @@ Open your browser and navigate to:
 http://localhost:3000
 ```
 
-## 🔍 Verification
+## Verification
 
 ### Test the Application
 
@@ -81,7 +81,7 @@ http://localhost:3000
 - ✅ Successful authentication
 - ✅ Dashboard with user information and tokens
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -125,7 +125,7 @@ http://localhost:3000
    aws lambda list-functions --query 'Functions[?contains(FunctionName, `cognito-sendzenOTP-auth`)].FunctionName'
    ```
 
-## 🎨 Development
+## Development
 
 ### Available Scripts
 ```bash
@@ -160,7 +160,7 @@ frontend/
 └── README.md                       # Documentation
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 
 ### Build for Production
 ```bash
@@ -186,7 +186,7 @@ amplify init
 amplify publish
 ```
 
-## 📚 Next Steps
+## Next Steps
 
 After successful frontend setup:
 1. Test both signup and login flows

@@ -1,10 +1,10 @@
 # AWS Cognito WhatsApp OTP Authentication - Node.js Backend
 
-This Node.js backend provides AWS Cognito custom authentication using WhatsApp OTP via free SendZen API. The system implements a complete serverless architecture with automatic User Pool and Lambda function creation using Serverless Framework.
+This Node.js backend provides AWS Cognito custom authentication using WhatsApp OTP via free SendZen API. The system implements a basic serverless architecture with User Pool and Lambda function creation using Serverless Framework.
 
 > **NOTE**: Refer to the shared frontend implementation in [Next.js Frontend](../nextjs-frontend/README.md) and [C# Backend](../c#-backend/) for alternative implementations.
 
-## 🚀 Overview
+## Overview
 
 The repo automatically creates and configures:
 - **AWS Cognito User Pool** with custom authentication flow
@@ -18,46 +18,35 @@ The repo automatically creates and configures:
 - **IAM Permissions** for Lambda-Cognito integration
 - **CloudWatch Logs** for monitoring and debugging
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
-- **Custom Authentication Flow**: Seamless integration with AWS Cognito triggers
-- **WhatsApp OTP Delivery**: Secure OTP delivery via SendZen WhatsApp API
-- **Auto-Confirmation**: Streamlined user onboarding process
+### Authentication Features
+- **Custom Authentication Flow**: AWS Cognito triggers
+- **WhatsApp OTP Delivery**: OTP delivery via SendZen WhatsApp API
+- **Auto-Confirmation**: Basic user onboarding process
 - **Dual Client Architecture**: Separate clients for signup and login flows
-- **Session Management**: Robust session handling with automatic cleanup
-- **Rate Limiting**: Built-in protection against brute force attacks
-- **Error Handling**: Comprehensive error handling and user feedback
+- **Session Management**: Basic session handling
+- **Error Handling**: Basic error handling and user feedback
 
-### 📱 WhatsApp Integration Features
-- **SendZen API Integration**: Reliable WhatsApp Business API for OTP delivery
-- **Template Messages**: Pre-approved message templates for consistent branding
-- **Multi-Language Support**: Support for different languages and regions
-- **Error Handling**: Graceful API failure handling with retry mechanisms
-- **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
-- **Template Management**: Easy template configuration and updates
-- **Fallback Handling**: Alternative delivery methods when WhatsApp fails
+### WhatsApp Integration Features
+- **SendZen API Integration**: WhatsApp Business API for OTP delivery
+- **Multi-Language Support**: Support for different template languages
+- **Error Handling**: Basic API failure handling
 
-### 🏗️ Architecture Features
+### Architecture Features
 - **Serverless Architecture**: AWS Lambda functions for scalability and cost-effectiveness
 - **Cloud-Native**: Built on AWS services (Cognito, Lambda, CloudWatch)
-- **Microservices Design**: Modular Lambda functions for maintainability
-- **Infrastructure as Code**: Serverless Framework for automated deployment
-- **Monitoring & Logging**: CloudWatch integration for observability
-- **Auto-Scaling**: Automatic scaling based on demand
-- **High Availability**: Multi-AZ deployment for reliability
+- **Infrastructure as Code**: Serverless Framework for deployment
+- **Monitoring & Logging**: Basic CloudWatch integration
 
-### 🔒 Security Features
+### Security Features
 - **Input Validation**: E.164 phone number format validation
 - **XSS Protection**: Framework built-in XSS protection
 - **CSRF Protection**: AWS Cognito's built-in CSRF protection
-- **Secure Storage**: Proper token storage with automatic cleanup
-- **Audit Trail**: Comprehensive logging for security monitoring
-- **Rate Limiting**: Protection against brute force attacks
-- **Secret Hash**: HMAC-SHA256 for secure client-server communication
-- **Token Security**: Secure JWT token management with automatic expiration
+- **Token Storage**: Basic token storage
+- **Token Security**: Basic JWT token management
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Required Software
 - **Node.js 18.x or higher**
@@ -70,13 +59,16 @@ The repo automatically creates and configures:
 - Access to AWS Cognito, Lambda, IAM, and CloudWatch services
 - Ability to create and manage IAM roles and policies
 
-## 🔐 AWS Permissions Required
+## AWS Permissions Required
 
 ### Minimum Required Permissions
 
 Your AWS credentials must have the following permissions to deploy this serverless application:
 
 #### 1. Lambda Service Permissions
+<details>
+<summary>Click to expand Lambda permissions</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -102,7 +94,12 @@ Your AWS credentials must have the following permissions to deploy this serverle
 }
 ```
 
+</details>
+
 #### 2. Cognito Identity Provider Permissions
+<details>
+<summary>Click to expand Cognito permissions</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -134,7 +131,12 @@ Your AWS credentials must have the following permissions to deploy this serverle
 }
 ```
 
+</details>
+
 #### 3. IAM Service Permissions
+<details>
+<summary>Click to expand IAM permissions</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -167,7 +169,12 @@ Your AWS credentials must have the following permissions to deploy this serverle
 }
 ```
 
+</details>
+
 #### 4. CloudWatch Logs Permissions
+<details>
+<summary>Click to expand CloudWatch permissions</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -189,7 +196,12 @@ Your AWS credentials must have the following permissions to deploy this serverle
 }
 ```
 
+</details>
+
 #### 5. CloudFormation Permissions
+<details>
+<summary>Click to expand CloudFormation permissions</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -212,7 +224,12 @@ Your AWS credentials must have the following permissions to deploy this serverle
 }
 ```
 
+</details>
+
 ### Complete AWS Policy
+
+<details>
+<summary>Click to expand complete AWS policy</summary>
 
 For convenience, here's a complete IAM policy that includes all required permissions:
 
@@ -243,7 +260,9 @@ For convenience, here's a complete IAM policy that includes all required permiss
 }
 ```
 
-## 🛠 Setup Instructions
+</details>
+
+## Setup Instructions
 
 ### 1. Install Dependencies
 
@@ -326,7 +345,7 @@ serverless deploy --stage production
 serverless deploy --region us-east-1
 ```
 
-## 🏗 Architecture Overview
+## Architecture Overview
 
 ### Authentication Flow Diagram
 
@@ -454,7 +473,7 @@ serverless deploy --region us-east-1
    - Session established with proper expiration
    - User redirected to authenticated dashboard
 
-## 🔧 Configuration Details
+## Configuration Details
 
 ### Serverless Framework Configuration
 
@@ -478,7 +497,7 @@ Each Lambda function receives:
 - `OTP_EXPIRY_MINUTES`: OTP expiration time
 - `MAX_LOGIN_ATTEMPTS`: Maximum login attempts
 
-## 🚀 Deployment Commands
+## Deployment Commands
 
 ### Development Deployment
 ```bash
@@ -510,7 +529,7 @@ serverless deploy --verbose
 serverless deploy function --function preSignUp
 ```
 
-## 📊 Monitoring and Logs
+## Monitoring and Logs
 
 ### CloudWatch Logs
 - Each Lambda function creates its own log group
@@ -529,7 +548,7 @@ serverless logs --function preSignUp --tail
 serverless logs
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Deployment Issues
 
@@ -563,7 +582,7 @@ aws cognito-idp list-user-pools --max-items 10
 aws lambda list-functions
 ```
 
-## 🧹 Cleanup
+## Cleanup
 
 ### Remove All Resources
 ```bash
@@ -581,14 +600,14 @@ If automatic cleanup fails, manually remove:
 3. CloudWatch Log Groups
 4. IAM Roles and Policies
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [AWS Cognito Documentation](https://docs.aws.amazon.com/cognito/)
 - [Serverless Framework Documentation](https://www.serverless.com/framework/docs/)
 - [SendZen API Documentation](https://www.sendzen.io/docs)
 - [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - **IAM Permissions**: Use least privilege principle
 - **Environment Variables**: Never commit sensitive data to version control
@@ -596,6 +615,6 @@ If automatic cleanup fails, manually remove:
 - **Cognito Security**: User Pool configured with security best practices
 - **Secret Management**: Consider using AWS Secrets Manager for production
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.

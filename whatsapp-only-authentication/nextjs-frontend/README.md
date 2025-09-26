@@ -4,29 +4,24 @@ A modern React/Next.js frontend application for AWS Cognito authentication with 
 
 > **NOTE**: Refer to server-side backend implementations in [Node.js Backend](../nodejs-backend/README.md) and [C# Backend](../c#-backend/) for backend setup and configuration. 
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
+### Authentication Features
 - **Phone Number Signup**: Registration with phone number and password validation
 - **WhatsApp OTP Verification**: Secure OTP verification via WhatsApp for both signup and login
 - **Custom Authentication Flow**: Seamless integration with AWS Cognito custom auth triggers
-- **Secret Hash Authentication**: Secure authentication using HMAC-SHA256 secret hashes
-- **Token Management**: JWT token storage and management with automatic refresh
+- **Token Management**: Basic JWT token storage and management
 - **Session Management**: Robust session handling with automatic cleanup
-- **Rate Limiting**: Built-in protection against brute force attacks
 - **Error Handling**: Comprehensive error handling and user feedback
 
-### 🎨 Frontend Features
+### Frontend Features
 - **Modern UI/UX**: Clean, intuitive interface with modern design patterns
 - **Real-time Validation**: Client-side form validation with immediate feedback
-- **Progressive Enhancement**: Mobile-first design with desktop optimization
-- **Accessibility**: WCAG 2.1 AA compliant interface
 - **Error Recovery**: Comprehensive error handling with user-friendly messages
 - **Loading States**: Visual feedback during authentication processes
-- **Responsive Design**: Works seamlessly on all device sizes
-- **Dark/Light Mode**: Ready for theme switching (configurable)
+- **Responsive Design**: Basic responsive design for mobile and desktop
 
-### 📱 WhatsApp Integration Features
+### WhatsApp Integration Features
 - **OTP Delivery**: Secure OTP delivery via WhatsApp Business API
 - **Template Messages**: Pre-approved message templates for consistent branding
 - **Multi-Language Support**: Support for different languages and regions
@@ -35,7 +30,7 @@ A modern React/Next.js frontend application for AWS Cognito authentication with 
 - **Template Management**: Easy template configuration and updates
 - **Fallback Handling**: Alternative delivery methods when WhatsApp fails
 
-### 🔒 Security Features
+### Security Features
 - **Input Validation**: E.164 phone number format validation
 - **XSS Protection**: Framework built-in XSS protection
 - **CSRF Protection**: AWS Cognito's built-in CSRF protection
@@ -45,7 +40,7 @@ A modern React/Next.js frontend application for AWS Cognito authentication with 
 - **Secret Hash**: HMAC-SHA256 for secure client-server communication
 - **Token Security**: Secure JWT token management with automatic expiration
 
-### 🏗️ Architecture Features
+### Architecture Features
 - **Next.js 14+**: Modern React framework with App Router
 - **TypeScript**: Type safety and better development experience
 - **Tailwind CSS**: Utility-first CSS framework for styling
@@ -149,6 +144,9 @@ Your AWS Cognito User Pool should be configured with:
 
 ## Project Structure
 
+<details>
+<summary>Click to expand project structure</summary>
+
 ```
 frontend/
 ├── src/
@@ -168,7 +166,9 @@ frontend/
 └── README.md                       # This file
 ```
 
-## 🔄 Authentication Flow
+</details>
+
+## Authentication Flow
 
 ### Signup Flow
 **Purpose**: Create new user accounts with WhatsApp verification
@@ -297,31 +297,16 @@ The application uses AWS SDK v3 for Cognito integration with comprehensive secre
 - **GetUser**: Retrieve user information using access tokens
 - **GlobalSignOut**: Secure logout with token invalidation
 
-### Secret Hash Implementation
-The application implements HMAC-SHA256 secret hash generation using the Web Crypto API:
-
-```typescript
-// Secret hash generation for all Cognito operations
-const secretHash = await generateSecretHash(username);
-```
-
-**Why Secret Hash is Required:**
-- Cognito User Pools with client secrets require HMAC-SHA256 authentication
-- Prevents unauthorized access to user pools
-- Ensures secure communication between client and Cognito
 
 ### Session Management
 - **Authentication Session**: Stored during custom auth flow
 - **Token Storage**: Secure localStorage implementation
 - **Session Cleanup**: Automatic cleanup on logout or errors
-- **Token Refresh**: Handles token expiration and renewal
 
 ## Styling
 
 - **Tailwind CSS**: Utility-first CSS framework
 - **Lucide React**: Beautiful icon library
-- **Responsive Design**: Mobile-first approach
-- **Dark/Light Mode**: Ready for theme switching
 
 ## Error Handling
 
@@ -333,9 +318,8 @@ const secretHash = await generateSecretHash(username);
 ## Security Features
 
 ### Authentication Security
-- **Secret Hash Authentication**: HMAC-SHA256 for all Cognito operations
-- **Token Security**: Secure token storage and management
-- **Session Management**: Proper session cleanup and invalidation
+- **Token Security**: Basic token storage and management
+- **Session Management**: Basic session cleanup and invalidation
 - **Input Validation**: E.164 phone number format validation
 - **Error Handling**: Secure error messages without sensitive information
 

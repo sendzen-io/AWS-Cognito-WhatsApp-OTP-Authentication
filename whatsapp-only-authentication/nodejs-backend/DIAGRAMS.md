@@ -2,7 +2,7 @@
 
 This directory contains PlantUML diagrams that visualize the AWS Cognito WhatsApp OTP Authentication backend architecture and flow. These diagrams provide comprehensive visual documentation of the system's architecture, components, and authentication flows.
 
-## 📊 Available Diagrams
+## Available Diagrams
 
 ### 1. **architecture-diagram.puml** - Complete Architecture Overview
 - **Purpose**: Shows the complete backend architecture with all components
@@ -79,7 +79,7 @@ This directory contains PlantUML diagrams that visualize the AWS Cognito WhatsAp
   - CloudWatch log group setup
   - Environment variable configuration
 
-## 🖼️ How to View These Diagrams
+## How to View These Diagrams
 
 ### 1. **GitHub/GitLab (Recommended)**
 - **Automatic Rendering**: GitHub and GitLab automatically render PlantUML diagrams
@@ -125,7 +125,7 @@ mmdc -i diagram.mmd -o diagram.png
 mmdc -i diagram.mmd -o diagram.svg
 ```
 
-## 🔄 Auto-Generation Process
+## Auto-Generation Process
 
 ### How It Works
 1. **Source Files**: PlantUML source files (`.puml`) are maintained in this directory
@@ -140,7 +140,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **Output**: SVG files with consistent naming convention
 - **Validation**: Automatic validation of PlantUML syntax
 
-## 📋 Diagram Descriptions
+## Diagram Descriptions
 
 ### Architecture Diagram Features
 - **Complete Flow**: Shows both signup and login processes
@@ -178,7 +178,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **CI/CD Pipeline**: Automated deployment process
 - **Monitoring**: Deployment monitoring and alerting
 
-## 🎯 Diagram Usage Guidelines
+## Diagram Usage Guidelines
 
 ### For Developers
 - **Architecture Understanding**: Use architecture diagrams to understand system design
@@ -204,7 +204,7 @@ mmdc -i diagram.mmd -o diagram.svg
 - **Infrastructure Investment**: Use component diagrams to understand infrastructure needs
 - **Security Compliance**: Use security diagrams to understand security measures
 
-## 🔧 Customizing Diagrams
+## Customizing Diagrams
 
 ### Adding New Components
 ```plantuml
@@ -227,20 +227,20 @@ the component functionality
 end note
 ```
 
-## 📚 PlantUML Resources
+## PlantUML Resources
 
 - [PlantUML Documentation](https://plantuml.com/)
 - [AWS Icons for PlantUML](https://github.com/awslabs/aws-icons-for-plantuml)
 - [PlantUML Cheat Sheet](https://plantuml.com/guide)
 
-## 🎯 Usage Recommendations
+## Usage Recommendations
 
 1. **For Documentation**: Use architecture-diagram.puml in README files
 2. **For Development**: Use sequence-diagram.puml to understand flows
 3. **For DevOps**: Use deployment-diagram.puml for infrastructure understanding
 4. **For Architecture Reviews**: Use component-diagram.puml for system design
 
-## 🔄 Updating Diagrams
+## Updating Diagrams
 
 When making changes to the backend:
 1. Update the relevant `.puml` files

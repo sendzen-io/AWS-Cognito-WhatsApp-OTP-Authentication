@@ -1,64 +1,45 @@
 # WhatsApp-Email Authentication Backend
 
-A serverless AWS Cognito custom authentication system that combines email verification with WhatsApp OTP for secure user authentication. This backend provides Lambda triggers for AWS Cognito to handle the complete dual-channel authentication flow.
+A serverless AWS Cognito custom authentication system that combines email verification with WhatsApp OTP. This backend provides Lambda triggers for AWS Cognito to handle dual-channel authentication flow.
 
-## 🚀 Overview
+## Overview
 
-This system implements a sophisticated dual-client authentication flow:
+This system implements a dual-client authentication flow:
 - **Signup Flow**: Email verification → WhatsApp OTP verification
 - **Login Flow**: Direct WhatsApp OTP verification
-- **Enhanced Security**: Multi-step verification process
-- **Backup Authentication**: Multiple verification methods
+- **Multi-step Verification**: Email + WhatsApp verification
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
+### Authentication Features
 - **Dual-Channel Verification**: WhatsApp OTP + Email confirmation
 - **Email-First Flow**: Email confirmation before WhatsApp verification
-- **Backup Authentication**: Multiple verification methods for enhanced security
 - **Flexible Login**: Login using either phone number or email
-- **Enhanced Security**: Multi-step verification process
 - **Client Role System**: Separate flows for signup and login
-- **Session Management**: Robust session handling with automatic cleanup
-- **Rate Limiting**: Built-in protection against brute force attacks
+- **Session Management**: Basic session handling
 
-### 📱 WhatsApp Integration Features
+### WhatsApp Integration Features
 - **SendZen API Integration**: Reliable WhatsApp Business API for OTP delivery
-- **Template Messages**: Pre-approved message templates for consistent branding
-- **Multi-Language Support**: Support for different languages and regions
-- **Error Handling**: Graceful API failure handling with retry mechanisms
-- **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
-- **Template Management**: Easy template configuration and updates
-- **Fallback Handling**: Alternative delivery methods when WhatsApp fails
+- **Multi-Language Support**: Support for different template languages
 
-### 📧 Email Integration Features
+### Email Integration Features
 - **AWS Cognito Email Service**: Built-in email verification
-- **Email Templates**: Customizable email templates
-- **Delivery Tracking**: Email delivery monitoring
-- **Error Handling**: Graceful email failure handling
-- **Multi-Language Support**: Support for different languages
-- **Template Management**: Easy email template configuration
+- **Email Templates**: Basic email templates
 
-### 🏗️ Architecture Features
+
+### Architecture Features
 - **Serverless Architecture**: AWS Lambda functions for scalability and cost-effectiveness
 - **Cloud-Native**: Built on AWS services (Cognito, Lambda, CloudWatch)
-- **Microservices Design**: Modular Lambda functions for maintainability
-- **Infrastructure as Code**: Serverless Framework for automated deployment
-- **Monitoring & Logging**: CloudWatch integration for observability
-- **Auto-Scaling**: Automatic scaling based on demand
-- **High Availability**: Multi-AZ deployment for reliability
+- **Infrastructure as Code**: Serverless Framework for deployment
+- **Monitoring & Logging**: Basic CloudWatch integration
 
-### 🔒 Security Features
+
+### Security Features
 - **Input Validation**: E.164 phone number and email format validation
-- **XSS Protection**: Framework built-in XSS protection
-- **CSRF Protection**: AWS Cognito's built-in CSRF protection
-- **Secure Storage**: Proper token storage with automatic cleanup
-- **Audit Trail**: Comprehensive logging for security monitoring
-- **Rate Limiting**: Protection against brute force attacks
-- **Secret Hash**: HMAC-SHA256 for secure client-server communication
-- **Token Security**: Secure JWT token management with automatic expiration
+- **Token Storage**: Basic token storage
+- **Token Security**: Basic JWT token management
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ### Key Components
 
@@ -70,6 +51,9 @@ This system implements a sophisticated dual-client authentication flow:
 - **Dual-Client Architecture** for enhanced security
 
 ### System Architecture
+
+<details>
+<summary>Click to expand system architecture diagram</summary>
 
 ```mermaid
 graph TB
@@ -122,7 +106,9 @@ graph TB
     PostConfirm --> CloudWatch
 ```
 
-## 📋 Prerequisites
+</details>
+
+## Prerequisites
 
 - Node.js 18+ 
 - AWS CLI configured with appropriate permissions
@@ -130,7 +116,7 @@ graph TB
 - SendZen API account and credentials
 - AWS account with Cognito, Lambda, and IAM permissions
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Environment Setup
 
@@ -193,7 +179,7 @@ After deployment, note the output values:
 
 These will be needed for the frontend configuration.
 
-## 🔧 Configuration
+## Configuration
 
 ### SendZen WhatsApp Setup
 
@@ -214,7 +200,7 @@ The deployment requires the following AWS permissions:
 - `cloudformation:*`
 - `logs:*`
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -229,7 +215,7 @@ src/
 └── postConfirmation.ts     # Post-confirmation trigger handler
 ```
 
-## 🔄 Authentication Flow
+## Authentication Flow
 
 ### Signup Flow
 **Purpose**: Create new user accounts with dual-channel verification (Email + WhatsApp)
@@ -295,6 +281,9 @@ src/
 
 ### Authentication Flow Diagram
 
+<details>
+<summary>Click to expand authentication flow diagram</summary>
+
 ```mermaid
 sequenceDiagram
     participant User as User
@@ -354,7 +343,9 @@ sequenceDiagram
     Cognito-->>Frontend: Authentication tokens
 ```
 
-## 🛠️ Lambda Functions
+</details>
+
+## Lambda Functions
 
 ### PreSignUp Trigger
 - Validates phone number presence
@@ -381,7 +372,7 @@ sequenceDiagram
 - Updates custom attributes
 - Completes verification process
 
-## 🔐 Security Features
+## Security Features
 
 - **Cryptographically Secure OTP**: Uses Node.js crypto module
 - **Rate Limiting**: Configurable attempt limits
@@ -389,7 +380,7 @@ sequenceDiagram
 - **Input Validation**: Comprehensive validation at all levels
 - **Error Handling**: Detailed error logging and user feedback
 
-## 📊 Monitoring and Logging
+## Monitoring and Logging
 
 ### CloudWatch Logs
 All Lambda functions log to CloudWatch with structured logging:
@@ -404,7 +395,7 @@ All Lambda functions log to CloudWatch with structured logging:
 - `error`: Authentication failures
 - `debug`: Detailed debugging information
 
-## 🧪 Testing
+## Testing
 
 ### Local Testing
 ```bash
@@ -424,7 +415,7 @@ npm run format
 3. Test login flow with existing user
 4. Verify error handling scenarios
 
-## 🚨 Error Handling
+## Error Handling
 
 ### Common Error Scenarios
 
@@ -445,7 +436,7 @@ npm run format
 }
 ```
 
-## 🔄 Deployment
+## Deployment
 
 ### Development Deployment
 ```bash
@@ -461,7 +452,7 @@ npm run deploy:prod
 - Development: Enhanced logging, relaxed limits
 - Production: Optimized performance, strict security
 
-## 📈 Performance Optimization
+## Performance Optimization
 
 ### Lambda Optimization
 - **Cold Start**: Minimized dependencies
@@ -474,7 +465,7 @@ npm run deploy:prod
 - **User Attributes**: Minimized Cognito API calls
 - **OTP Storage**: In-memory during challenge
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -500,7 +491,7 @@ LOG_LEVEL=debug
 NODE_ENV=development
 ```
 
-## 📚 API Reference
+## API Reference
 
 ### Environment Variables
 
@@ -524,11 +515,11 @@ export const handler: TriggerHandler = async (event: TriggerEvent) => {
 };
 ```
 
-## 📊 System Diagrams
+## System Diagrams
 
 For comprehensive system diagrams including architecture, authentication flows, component interactions, and deployment architecture, see the [DIAGRAMS.md](../DIAGRAMS.md) file.
 
-### 🖼️ How to View Diagrams
+### How to View Diagrams
 
 The diagrams are written in **Mermaid** syntax. Here are quick ways to view them:
 
@@ -550,7 +541,7 @@ The diagrams are written in **Mermaid** syntax. Here are quick ways to view them
 - Copy diagram code from [DIAGRAMS.md](../DIAGRAMS.md)
 - Paste and view/export as PNG/SVG
 
-### 📋 Available Diagrams
+### Available Diagrams
 
 The diagrams include:
 - **System Architecture**: Overall system structure and component relationships
@@ -564,7 +555,7 @@ The diagrams include:
 - **Deployment Architecture**: CI/CD pipeline and deployment process
 - **Performance Monitoring**: Performance monitoring and optimization strategy
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -572,11 +563,11 @@ The diagrams include:
 4. Add tests
 5. Submit a pull request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
+## Support
 
 For support and questions:
 - Create an issue in the repository
@@ -584,7 +575,7 @@ For support and questions:
 - Review AWS Cognito documentation
 - Consult SendZen API documentation
 
-## 🔄 Version History
+## Version History
 
 - **v1.0.0**: Initial release with dual-client authentication
 - **v1.1.0**: Added comprehensive error handling

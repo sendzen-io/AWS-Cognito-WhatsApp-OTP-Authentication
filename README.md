@@ -2,54 +2,45 @@
 
 A comprehensive, production-ready authentication system that provides multiple ways to implement WhatsApp OTP authentication with AWS Cognito. This project offers isolated, ready-to-use implementations for different authentication scenarios and technology stacks.
 
-## 🚀 Overview
+## Overview
 
-This project provides a complete authentication solution using AWS Cognito with WhatsApp OTP verification via free SendZen API. It includes multiple implementation options to suit different requirements:
+This project demonstrates WhatsApp OTP authentication using AWS Cognito with free SendZen API. It includes:
 
 - **WhatsApp Only Authentication**: Phone number-based authentication with WhatsApp OTP
 - **WhatsApp + Email Authentication**: Dual-channel authentication with both WhatsApp and email verification
-- **Multiple Technology Stacks**: Node.js and C# implementations
-- **Isolated Dependencies**: Each project is self-contained with its own dependencies
+- **Node.js Implementation**: Working Lambda functions and frontend
+- **C# Implementation**: Placeholder (coming soon)
 
-## 🎯 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🔐 Authentication Features
-- **Multi-Channel Authentication**: WhatsApp OTP with optional email verification
-- **Custom Authentication Flow**: Seamless integration with AWS Cognito triggers
-- **Secret Hash Authentication**: HMAC-SHA256 for secure client-server communication
-- **Session Management**: Robust JWT token handling with automatic refresh
-- **Rate Limiting**: Built-in protection against brute force attacks
-- **Auto-Confirmation**: Streamlined user onboarding process
+### Authentication Features
+- **WhatsApp OTP**: Phone number-based authentication with WhatsApp OTP
+- **Email + WhatsApp**: Dual-channel authentication (email verification + WhatsApp OTP)
+- **Custom Authentication Flow**: AWS Cognito triggers for authentication logic
+- **Basic Session Management**: JWT token handling
 
-### 📱 WhatsApp Integration
-- **SendZen API Integration**: Reliable WhatsApp Business API for OTP delivery
-- **Template Messages**: Pre-approved message templates for consistent branding
-- **Multi-Language Support**: Support for different languages and regions
-- **Error Handling**: Graceful API failure handling with retry mechanisms
-- **Delivery Tracking**: Comprehensive logging and monitoring
+### WhatsApp Integration
+- **SendZen API**: WhatsApp Business API for OTP delivery
+- **Basic Error Handling**: Simple error handling for API failures
 
-### 🏗️ Architecture Features
-- **Serverless Architecture**: AWS Lambda functions for scalability and cost-effectiveness
-- **Cloud-Native**: Built on AWS services (Cognito, Lambda, CloudWatch)
-- **Microservices Design**: Modular Lambda functions for maintainability
-- **Infrastructure as Code**: Serverless Framework for automated deployment
-- **Monitoring & Logging**: CloudWatch integration for observability
+### Architecture Features
+- **Serverless**: AWS Lambda functions
+- **AWS Services**: Cognito, Lambda, CloudWatch
+- **Serverless Framework**: Infrastructure deployment
+- **Basic Logging**: Console.log to CloudWatch
 
-### 🎨 Frontend Features
-- **Modern UI/UX**: React/Next.js with responsive design
-- **Real-time Validation**: Client-side form validation with immediate feedback
-- **Progressive Enhancement**: Mobile-first design with desktop optimization
-- **Accessibility**: WCAG 2.1 AA compliant interface
-- **Error Recovery**: Comprehensive error handling with user-friendly messages
+### Frontend Features
+- **React/Next.js**: Basic UI with responsive design
+- **Form Validation**: Client-side validation
+- **Error Handling**: Basic error messages
 
-### 🔒 Security Features
+### Security Features
 - **Input Validation**: E.164 phone number and email format validation
-- **XSS Protection**: Framework built-in XSS protection
-- **CSRF Protection**: AWS Cognito's built-in CSRF protection
-- **Secure Storage**: Proper token storage with automatic cleanup
-- **Audit Trail**: Comprehensive logging for security monitoring
 
 ## 📁 Project Structure
+
+<details>
+<summary>Click to expand project structure</summary>
 
 ```
 AWS-Cognito-WhatsApp-OTP-Authentication/
@@ -89,19 +80,19 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 ├── LICENSE                              # License file
 └── README.md                            # This file
 ```
+</details>
 
-## 🔐 Authentication Methods & Flows
+##  Authentication Methods & Flows
 
 ### 1. WhatsApp Only Authentication
-**Perfect for**: Mobile-first applications, international users, simplified onboarding
+**Use case**: Simple phone number authentication
 
 **Core Features**:
 - **Phone Number Registration**: E.164 format validation with real-time feedback
 - **WhatsApp OTP Verification**: Secure 6-digit OTP delivery via WhatsApp Business API
 - **Auto-Confirmation**: Streamlined account activation process
 - **Passwordless Login**: Login using phone number + WhatsApp OTP
-- **Session Management**: JWT token handling with automatic refresh
-- **Rate Limiting**: Protection against brute force attacks
+- **Session Management**: Basic JWT token handling
 
 **Detailed Authentication Flow**:
 1. **User Registration**:
@@ -129,15 +120,13 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
    - User verifies OTP to complete authentication
    - Session established with secure token management
 
-### 2. WhatsApp + Email Authentication
-**Perfect for**: Enterprise applications, enhanced security, backup verification
+### 2. Email + WhatsApp Authentication
+**Use case**: Email + WhatsApp dual verification
 
 **Core Features**:
 - **Dual-Channel Verification**: WhatsApp OTP + Email confirmation
 - **Email-First Flow**: Email confirmation before WhatsApp verification
-- **Backup Authentication**: Multiple verification methods for enhanced security
 - **Flexible Login**: Login using either phone number or email
-- **Enhanced Security**: Multi-step verification process
 - **Client Role System**: Separate flows for signup and login
 
 **Detailed Authentication Flow**:
@@ -172,7 +161,7 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
    - User verifies OTP to complete authentication
    - Session established with secure token management
 
-## 🛠 Technology Stack & Architecture
+## Technology Stack & Architecture
 
 ### Node.js Implementation
 **Backend Architecture**:
@@ -192,20 +181,21 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 - **Build Tool**: Vite for fast development and building
 
 **Deployment & DevOps**:
-- **Infrastructure**: Serverless Framework with CloudFormation
-- **CI/CD**: GitHub Actions for automated deployment
-- **Environment Management**: Multi-stage deployment (dev, staging, prod)
-- **Monitoring**: CloudWatch dashboards and alerts
-- **Security**: IAM roles with least privilege principle
+- **Infrastructure**: Serverless Framework with 
+CloudFormation
+- **CI/CD**: Basic deployment scripts
+- **Environment Management**: Basic multi-stage deployment
+- **Monitoring**: Basic CloudWatch logging
+- **Security**: Basic IAM roles
 
 ### C# Implementation
-**Backend Architecture**:
+**Status**: Coming soon (placeholder only)
 - **Runtime**: AWS Lambda with .NET 8
-- **Language**: C# with modern language features
+- **Language**: C#
 - **Framework**: AWS SAM or Serverless Framework
-- **Authentication**: AWS Cognito with custom authentication triggers
-- **API Integration**: SendZen WhatsApp Business API
-- **Monitoring**: CloudWatch for logging and metrics
+- **Authentication**: AWS Cognito with custom triggers
+- **API Integration**: SendZen WhatsApp API
+- **Monitoring**: Basic CloudWatch logging
 
 **Frontend Architecture**:
 - **Framework**: Next.js 14+ with React 18 (shared frontend)
@@ -223,14 +213,13 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 - **Security**: IAM roles with least privilege principle
 
 ### Shared Frontend Approach
-**Key Innovation**: The frontend is shared between different backend implementations, providing:
-- **Consistent User Experience**: Same UI/UX regardless of backend technology
-- **Reduced Development Time**: Single frontend codebase for multiple backends
-- **Easy Backend Switching**: Change backend without frontend modifications
-- **Unified Deployment**: Frontend can be deployed independently of backend
-- **Cost Optimization**: Single frontend deployment for multiple backend implementations
+**Note**: The frontend works with different backend implementations:
+- **Consistent UI**: Same interface for different backends
+- **Single Codebase**: One frontend for multiple backends
+- **Backend Flexibility**: Works with Node.js or C# backends
+- **Independent Deployment**: Deploy frontend separately from backend
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - **Node.js 18+** (for Node.js implementations)
@@ -262,7 +251,7 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 
 ### Shared Frontend Approach
 
-**Key Innovation**: The frontend is shared between different backend implementations. You only need to:
+**Note**: The frontend works with any backend implementation. You need to:
 1. Deploy your chosen backend (Node.js or C#)
 2. Update frontend environment variables with backend outputs
 3. Run the frontend - it works with any backend!
@@ -271,9 +260,9 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 - **WhatsApp Only**: `whatsapp-only-authentication/nextjs-frontend/`
 - **WhatsApp + Email**: `whatsapp-email-authentication/react-frontend/`
 
-## 📋 Step-by-Step Installation Guide
+## Step-by-Step Installation Guide
 
-### 🔧 Backend Installation (Node.js)
+### Backend Installation (Node.js)
 
 #### Step 1: Navigate to Backend Directory
 ```bash
@@ -318,7 +307,7 @@ After successful deployment, note these values from the output:
 - **LoginClientId**: `xxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **Region**: `your_aws_region` (your chosen region)
 
-### 🎨 Frontend Installation (Node.js)
+### Frontend Installation (Node.js)
 
 #### Step 1: Navigate to Frontend Directory
 ```bash
@@ -353,7 +342,7 @@ Open your browser and navigate to:
 http://localhost:3000
 ```
 
-### 🔍 Verification Steps
+### Verification Steps
 
 #### Backend Verification
 1. **Check AWS Console**:
@@ -377,7 +366,7 @@ http://localhost:3000
    - Check if OTP is received
    - Verify successful authentication
 
-### 🚨 Troubleshooting
+### Troubleshooting
 
 #### Backend Issues
 - **Deployment Fails**: Check AWS credentials and permissions
@@ -389,7 +378,7 @@ http://localhost:3000
 - **Authentication Fails**: Verify environment variables
 - **Build Errors**: Check Node.js version compatibility
 
-## 🔧 Configuration
+##  Configuration
 
 ### Required Environment Variables
 
@@ -445,91 +434,7 @@ Each implementation requires specific Cognito configuration:
 - **Auth Flows**: Custom authentication enabled
 - **Secret Generation**: Disabled for simplicity
 
-## 📱 Detailed Features & Capabilities
-
-### 🔐 Core Authentication Features
-- ✅ **Multi-Channel Authentication**: WhatsApp OTP with optional email verification
-- ✅ **Auto-Confirmation**: Seamless user onboarding with automatic account activation
-- ✅ **OTP Verification**: Cryptographically secure 6-digit OTP with configurable expiry
-- ✅ **Retry Logic**: Configurable verification attempts (default: 3 attempts)
-- ✅ **Session Management**: Secure JWT token handling with automatic refresh
-- ✅ **Error Handling**: Comprehensive error management with user-friendly messages
-- ✅ **Responsive Design**: Mobile-first UI with desktop optimization
-- ✅ **Security**: Secret hash authentication, input validation, and rate limiting
-
-### 📱 WhatsApp Integration Features
-- ✅ **SendZen API**: Reliable WhatsApp Business API integration
-- ✅ **Template Messages**: Pre-approved message templates for consistent branding
-- ✅ **Multi-Language Support**: Support for different languages and regions
-- ✅ **Error Handling**: Graceful API failure handling with retry mechanisms
-- ✅ **Rate Limiting**: Built-in rate limiting protection against abuse
-- ✅ **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
-- ✅ **Template Management**: Easy template configuration and updates
-- ✅ **Fallback Handling**: Alternative delivery methods when WhatsApp fails
-
-### 🏗️ AWS Cognito Integration Features
-- ✅ **Custom Auth Flow**: Flexible authentication triggers for complex flows
-- ✅ **User Management**: Complete user lifecycle management (create, update, delete)
-- ✅ **Token Management**: JWT token handling with automatic refresh
-- ✅ **Security**: Built-in security features (MFA, password policies, etc.)
-- ✅ **Scalability**: Serverless architecture with automatic scaling
-- ✅ **Multi-Client Support**: Separate clients for signup and login flows
-- ✅ **Custom Attributes**: Support for custom user attributes
-- ✅ **Audit Trail**: Comprehensive logging for security and compliance
-
-### 🎨 Frontend Features
-- ✅ **Modern UI/UX**: Clean, intuitive interface with modern design patterns
-- ✅ **Real-time Validation**: Client-side form validation with immediate feedback
-- ✅ **Progressive Enhancement**: Mobile-first design with desktop optimization
-- ✅ **Accessibility**: WCAG 2.1 AA compliant interface
-- ✅ **Error Recovery**: Comprehensive error handling with user-friendly messages
-- ✅ **Loading States**: Visual feedback during authentication processes
-- ✅ **Responsive Design**: Works seamlessly on all device sizes
-- ✅ **Dark/Light Mode**: Ready for theme switching (configurable)
-
-### 🔒 Security Features
-- ✅ **Input Validation**: E.164 phone number and email format validation
-- ✅ **XSS Protection**: Framework built-in XSS protection
-- ✅ **CSRF Protection**: AWS Cognito's built-in CSRF protection
-- ✅ **Secure Storage**: Proper token storage with automatic cleanup
-- ✅ **Audit Trail**: Comprehensive logging for security monitoring
-- ✅ **Rate Limiting**: Protection against brute force attacks
-- ✅ **Secret Hash**: HMAC-SHA256 for secure client-server communication
-- ✅ **Token Security**: Secure JWT token management with automatic expiration
-
-### 📊 Monitoring & Observability Features
-- ✅ **CloudWatch Integration**: Comprehensive logging and metrics
-- ✅ **Performance Monitoring**: Real-time performance tracking
-- ✅ **Error Tracking**: Detailed error logging and analysis
-- ✅ **User Analytics**: Authentication flow analytics and insights
-- ✅ **Alert System**: Configurable alerts for critical events
-- ✅ **Dashboard**: Real-time monitoring dashboard
-- ✅ **Audit Logs**: Complete audit trail for compliance
-- ✅ **Health Checks**: System health monitoring and reporting
-
-## 🔒 Security Features
-
-### Authentication Security
-- **Secret Hash Authentication**: HMAC-SHA256 for all Cognito operations
-- **Token Security**: Secure JWT token storage and management
-- **Session Management**: Proper session cleanup and invalidation
-- **Input Validation**: E.164 phone number and email validation
-- **Error Handling**: Secure error messages without sensitive information
-
-### Data Protection
-- **Local Storage**: Secure token storage with automatic cleanup
-- **HTTPS Enforcement**: Production-ready HTTPS configuration
-- **Input Sanitization**: Form input validation and sanitization
-- **XSS Protection**: Framework built-in XSS protection
-- **CSRF Protection**: Cognito's built-in CSRF protection
-
-### Privacy Features
-- **Minimal Data Collection**: Only necessary user data
-- **Token Expiration**: Automatic token expiration handling
-- **Secure Logout**: Complete session and token cleanup
-- **No Sensitive Logging**: Avoids logging sensitive data
-
-## 🚀 Deployment
+## Deployment
 
 ### Backend Deployment
 
@@ -573,11 +478,12 @@ dotnet publish -c Release
 ```
 
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
 1. **OTP Not Received**:
+   - Check Template status
    - Check SendZen API credentials
    - Verify WhatsApp template configuration
    - Ensure phone number is in E.164 format
@@ -612,7 +518,7 @@ dotnet publish -c Release
    - AWS credentials
    - Cognito User Pool settings
 
-## 📊 Architecture Diagrams
+## Architecture Diagrams
 
 Each implementation includes comprehensive PlantUML diagrams:
 
@@ -628,7 +534,7 @@ Each implementation includes comprehensive PlantUML diagrams:
 - **Backup Authentication**: Alternative verification methods
 
 
-## 📚 Documentation
+## Documentation
 
 Each implementation includes detailed documentation:
 
@@ -638,7 +544,7 @@ Each implementation includes detailed documentation:
 - **API Documentation**: Authentication service methods
 - **Deployment Guides**: Platform-specific deployment instructions
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -646,11 +552,11 @@ Each implementation includes detailed documentation:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Support
 
 For support and questions:
 - Check the individual implementation README files
@@ -658,7 +564,7 @@ For support and questions:
 - Check [SendZen API documentation](https://www.sendzen.io/docs)
 - Open an issue in the repository
 
-## 🔄 Version History
+## Version History
 
 - **v1.0.0**: Initial release with WhatsApp-only authentication
 - **v1.1.0**: Added WhatsApp + Email authentication

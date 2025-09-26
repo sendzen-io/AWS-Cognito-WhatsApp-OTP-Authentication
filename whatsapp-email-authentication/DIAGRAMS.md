@@ -2,32 +2,32 @@
 
 This document contains comprehensive UML diagrams that visualize the WhatsApp-Email Authentication system architecture, components, and flows. These diagrams provide detailed visual documentation of the dual-channel authentication system's architecture, components, and authentication flows.
 
-## 📊 System Overview
+## System Overview
 
 The WhatsApp-Email Authentication system implements a sophisticated dual-client authentication flow using AWS Cognito custom authentication triggers and SendZen WhatsApp API integration. This system provides enhanced security through multi-step verification processes and backup authentication methods.
 
-## 🎯 Key Features Visualized
+## Key Features Visualized
 
-### 🔐 Dual-Channel Authentication
+### Dual-Channel Authentication
 - **Email Verification**: First-step email confirmation process
 - **WhatsApp OTP**: Second-step WhatsApp OTP verification
 - **Enhanced Security**: Multi-step verification for maximum security
 - **Backup Methods**: Alternative verification methods
 
-### 🏗️ Architecture Components
+### Architecture Components
 - **AWS Cognito User Pool**: Central authentication management
 - **Lambda Functions**: Custom authentication triggers
 - **SendZen API**: WhatsApp message delivery
 - **Email Service**: AWS Cognito email verification
 - **Client Role System**: Separate flows for signup and login
 
-### 📱 User Experience Flows
+### User Experience Flows
 - **Signup Flow**: Email → WhatsApp verification
 - **Login Flow**: Direct WhatsApp OTP verification
 - **Error Handling**: Comprehensive error recovery
 - **Progress Tracking**: Visual progress indicators
 
-## 🖼️ How to View These Diagrams
+## How to View These Diagrams
 
 The diagrams in this document are written in **Mermaid** syntax. Here are several ways to view them as visual diagrams:
 
@@ -96,7 +96,7 @@ mmdc -i architecture.mmd -o architecture.png
 - **VuePress**: With Mermaid plugin
 - **MkDocs**: With Mermaid plugin
 
-## 🚀 Quick Start: Viewing Diagrams
+## Quick Start: Viewing Diagrams
 
 ### **Easiest Method (GitHub)**
 1. Upload this file to a GitHub repository
@@ -117,7 +117,7 @@ mmdc -i architecture.mmd -o architecture.png
 5. Export as PNG/SVG if needed
 
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 **Purpose**: Complete dual-channel system architecture overview
 
@@ -134,6 +134,9 @@ mmdc -i architecture.mmd -o architecture.png
 - **WhatsApp Integration**: SendZen API for OTP delivery
 - **Monitoring**: Comprehensive CloudWatch logging
 - **Scalability**: Serverless architecture with auto-scaling
+
+<details>
+<summary>Click to expand architecture diagram</summary>
 
 ```mermaid
 graph TB
@@ -187,7 +190,9 @@ graph TB
     PostConfirm --> CloudWatch
 ```
 
-## 🔄 Authentication Flow Diagram
+</details>
+
+## Authentication Flow Diagram
 
 **Purpose**: Step-by-step dual-channel authentication flow visualization
 
@@ -203,6 +208,9 @@ graph TB
 - **Enhanced Security**: Multi-step verification process
 - **Error Recovery**: Comprehensive error handling
 - **State Management**: Authentication state transitions
+
+<details>
+<summary>Click to expand authentication flow diagram</summary>
 
 ```mermaid
 sequenceDiagram
@@ -263,7 +271,9 @@ sequenceDiagram
     Cognito-->>Frontend: Authentication tokens
 ```
 
-## 🎯 Component Interaction Diagram
+</details>
+
+## Component Interaction Diagram
 
 **Purpose**: Frontend component relationships and data flow
 
@@ -278,6 +288,9 @@ sequenceDiagram
 - **Error Handling**: Error propagation and display
 - **State Management**: Component state interactions
 - **Service Integration**: AWS service connections
+
+<details>
+<summary>Click to expand component interaction diagram</summary>
 
 ```mermaid
 graph LR
@@ -323,7 +336,9 @@ graph LR
     Validation --> ErrorDisplay
 ```
 
-## 🔐 Security Flow Diagram
+</details>
+
+## Security Flow Diagram
 
 **Purpose**: Comprehensive security measures and their relationships
 
@@ -342,6 +357,9 @@ graph LR
 - **Data Protection**: Encryption and sanitization
 - **Monitoring**: Real-time security monitoring
 - **Audit Trail**: Complete audit trail for compliance
+
+<details>
+<summary>Click to expand security flow diagram</summary>
 
 ```mermaid
 graph TD
@@ -393,7 +411,9 @@ graph TD
     Alerts --> Audit
 ```
 
-## 📱 User Experience Flow Diagram
+</details>
+
+## User Experience Flow Diagram
 
 **Purpose**: User journey through the dual-channel authentication application
 
@@ -410,6 +430,9 @@ graph TD
 - **User Feedback**: Visual feedback and progress indicators
 - **Accessibility**: WCAG compliant interface
 - **Mobile-First**: Responsive design for all devices
+
+<details>
+<summary>Click to expand user experience flow diagram</summary>
 
 ```mermaid
 stateDiagram-v2
@@ -464,7 +487,9 @@ stateDiagram-v2
     }
 ```
 
-## 🔧 Lambda Function Architecture
+</details>
+
+## Lambda Function Architecture
 
 **Purpose**: Internal structure of each Lambda function and their processing steps
 
@@ -482,6 +507,9 @@ stateDiagram-v2
 - **State Management**: Proper state transitions and data flow
 - **Security**: Secure processing and data handling
 - **Monitoring**: Comprehensive logging and monitoring
+
+<details>
+<summary>Click to expand Lambda function architecture diagram</summary>
 
 ```mermaid
 graph TB
@@ -550,7 +578,9 @@ graph TB
     PC1 --> CognitoClient
 ```
 
-## 📊 Data Flow Diagram
+</details>
+
+## Data Flow Diagram
 
 **Purpose**: How data flows through the dual-channel authentication system
 
@@ -569,6 +599,9 @@ graph TB
 - **External Integration**: Secure integration with external services
 - **Logging**: Comprehensive logging and monitoring
 - **Data Security**: Secure data handling and storage
+
+<details>
+<summary>Click to expand data flow diagram</summary>
 
 ```mermaid
 graph LR
@@ -636,7 +669,9 @@ graph LR
     StatusUpdate --> CloudWatch
 ```
 
-## 🚨 Error Handling Flow
+</details>
+
+## Error Handling Flow
 
 **Purpose**: Comprehensive error handling strategy for the dual-channel authentication system
 
@@ -653,6 +688,9 @@ graph LR
 - **User Messages**: User-friendly error messages
 - **Recovery Actions**: Automatic and manual recovery options
 - **Error Display**: Clear error UI with help and retry options
+
+<details>
+<summary>Click to expand error handling flow diagram</summary>
 
 ```mermaid
 graph TD
@@ -707,7 +745,9 @@ graph TD
     ErrorUI --> RetryOptions
 ```
 
-## 🔄 Deployment Architecture
+</details>
+
+## Deployment Architecture
 
 **Purpose**: CI/CD pipeline and deployment process for the dual-channel authentication system
 
@@ -724,6 +764,9 @@ graph TD
 - **Monitoring**: Comprehensive monitoring and alerting
 - **Rollback**: Easy rollback capabilities
 - **Security**: Secure deployment practices
+
+<details>
+<summary>Click to expand deployment architecture diagram</summary>
 
 ```mermaid
 graph TB
@@ -779,7 +822,9 @@ graph TB
     CloudWatch --> Dashboards
 ```
 
-## 📈 Performance Monitoring
+</details>
+
+## Performance Monitoring
 
 **Purpose**: Performance monitoring and optimization strategy for the dual-channel authentication system
 
@@ -796,6 +841,9 @@ graph TB
 - **Optimization**: Continuous performance optimization
 - **User Experience**: User experience monitoring and optimization
 - **Resource Management**: Efficient resource utilization
+
+<details>
+<summary>Click to expand performance monitoring diagram</summary>
 
 ```mermaid
 graph LR
@@ -847,9 +895,11 @@ graph LR
     ResourceOptimization --> CodeOptimization
 ```
 
+</details>
+
 ---
 
-## 📝 Diagram Notes
+## Diagram Notes
 
 ### Architecture Diagram
 - **Purpose**: Complete dual-channel system architecture overview
@@ -921,7 +971,7 @@ graph LR
 - **Optimization**: Optimization feedback loop
 - **Scalability**: Demonstrates auto-scaling and performance optimization
 
-## 🎯 Diagram Usage Guidelines
+## Diagram Usage Guidelines
 
 ### For Developers
 - **Architecture Understanding**: Use architecture diagrams to understand system design
