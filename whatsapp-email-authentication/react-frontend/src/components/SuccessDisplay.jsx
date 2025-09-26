@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SuccessDisplay = ({ type, data, onContinue }) => {
+const SuccessDisplay = ({ type, data, onLogout }) => {
   const isLogin = type === 'login';
   const isSignup = type === 'signup';
 
@@ -108,12 +108,6 @@ const SuccessDisplay = ({ type, data, onContinue }) => {
           {/* Action Buttons */}
           <div className="action-buttons">
             <button 
-              className="continue-btn"
-              onClick={onContinue}
-            >
-              {isLogin ? 'Go to Dashboard' : 'Continue to App'}
-            </button>
-            <button 
               className="copy-btn"
               onClick={() => {
                 navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -122,6 +116,14 @@ const SuccessDisplay = ({ type, data, onContinue }) => {
             >
               📋 Copy Data
             </button>
+            {onLogout && (
+              <button 
+                className="logout-btn"
+                onClick={onLogout}
+              >
+                🚪 Logout
+              </button>
+            )}
           </div>
         </div>
       </div>

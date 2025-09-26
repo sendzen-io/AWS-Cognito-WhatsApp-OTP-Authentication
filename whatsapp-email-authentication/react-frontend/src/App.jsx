@@ -20,11 +20,8 @@ const amplifyConfig = {
       region: import.meta.env.VITE_AWS_REGION || "eu-west-1",
       userPoolId: import.meta.env.VITE_USER_POOL_ID || "eu-west-1_NhDQ2Z6ed",
       userPoolClientId:
-        import.meta.env.VITE_USER_POOL_CLIENT_ID ||
-        "21gcqcb1d7f6g3tgc8hb1sil37",
-      userPoolClientSecret:
-        import.meta.env.VITE_USER_POOL_CLIENT_SECRET ||
-        "1peam6d6cqfhme7b5svor9gtta58tfloe51egp1fo4lhhr6dr8av",
+        import.meta.env.VITE_LOGIN_CLIENT_ID ||
+        "your_login_client_id_here",
     },
   },
 };
@@ -60,6 +57,7 @@ function App() {
     whatsappOtp: "",
     session: null,
     usernameForChallenge: null,
+    clientId: null, // Track which client ID was used for the challenge
   });
   const [error, setError] = useState("");
   const [successData, setSuccessData] = useState(null);
@@ -173,6 +171,7 @@ function App() {
         ...prev,
         session: result.session,
         usernameForChallenge: result.usernameForChallenge,
+        clientId: import.meta.env.VITE_LOGIN_CLIENT_ID, // Store login client ID
       }));
 
       // Stay in LOGIN state but show OTP field (no need to change auth state)
@@ -224,6 +223,7 @@ function App() {
         ...prev,
         session: result.session,
         usernameForChallenge: result.usernameForChallenge,
+        clientId: import.meta.env.VITE_SIGNUP_CLIENT_ID, // Store signup client ID
       }));
 
       // Move directly to WhatsApp OTP verification with the session already available
@@ -267,6 +267,7 @@ function App() {
         otp: formData.whatsappOtp,
         session: formData.session,
         usernameForChallenge: formData.usernameForChallenge || formData.email,
+        clientId: formData.clientId,
       });
 
       console.log("WhatsApp OTP verification result:", result);
@@ -305,12 +306,18 @@ function App() {
     try {
       const result = await handleResendOtp({
         email: formData.email,
+        isSignupFlow: isSignupFlow,
       });
 
       console.log("Resend OTP result:", result);
 
       // Update session for OTP verification
-      setFormData((prev) => ({ ...prev, session: result.session }));
+      setFormData((prev) => ({ 
+        ...prev, 
+        session: result.session,
+        usernameForChallenge: result.usernameForChallenge,
+        clientId: isSignupFlow ? import.meta.env.VITE_SIGNUP_CLIENT_ID : import.meta.env.VITE_LOGIN_CLIENT_ID,
+      }));
 
       setError("");
       alert("OTP has been resent to your WhatsApp number");
@@ -387,6 +394,7 @@ function App() {
         type="signup"
         data={successData}
         onContinue={() => setAuthState(AUTH_STATES.AUTHENTICATED)}
+        onLogout={handleLogout}
       />
     );
   }
@@ -397,6 +405,7 @@ function App() {
         type="login"
         data={successData}
         onContinue={() => setAuthState(AUTH_STATES.AUTHENTICATED)}
+        onLogout={handleLogout}
       />
     );
   }

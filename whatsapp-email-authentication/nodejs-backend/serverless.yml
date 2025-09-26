@@ -13,15 +13,18 @@ provider:
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
 
+    # WhatsApp SendZen config
     SENDZEN_API_URL: ${env:SENDZEN_API_URL}
     SENDZEN_API_KEY: ${env:SENDZEN_API_KEY}
     WHATSAPP_FROM: ${env:WHATSAPP_FROM}
+    WHATSAPP_TEMPLATE_NAME: ${env:WHATSAPP_TEMPLATE_NAME, 'otp_1'}
+    WHATSAPP_LANG_CODE: ${env:WHATSAPP_LANG_CODE, 'en_US'}
+
+    # OTP and logging
     OTP_EXPIRY_MINUTES: ${env:OTP_EXPIRY_MINUTES, '5'}
     MAX_LOGIN_ATTEMPTS: ${env:MAX_LOGIN_ATTEMPTS, '3'}
     NODE_ENV: ${env:NODE_ENV, 'development'}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
-    WHATSAPP_TEMPLATE_NAME: ${env:WHATSAPP_TEMPLATE_NAME, 'otp_1'}
-    WHATSAPP_LANG_CODE: ${env:WHATSAPP_LANG_CODE, 'en_US'}
 
   iamRoleStatements:
     - Effect: Allow
@@ -34,7 +37,6 @@ provider:
       Resource: "*"
 
 functions:
-  # TypeScript handlers. Each file must export handler
   preSignUp:
     handler: src/preSignUp.handler
 
@@ -55,7 +57,7 @@ resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: ${self:custom.userPoolName}
+        UserPoolName: ${env:COGNITO_USER_POOL_NAME, 'email-phone-otp-auth-pool-${self:provider.stage}'}
         Schema:
           - Name: email
             AttributeDataType: String
@@ -66,9 +68,6 @@ resources:
             Mutable: true
             Required: true
           - Name: whatsapp_verified
-            AttributeDataType: String
-            Mutable: true
-          - Name: auth_purpose
             AttributeDataType: String
             Mutable: true
         UsernameAttributes:
@@ -82,13 +81,10 @@ resources:
             RequireSymbols: true
             RequireUppercase: true
         MfaConfiguration: "OFF"
-        # Email configuration for sending verification codes
         EmailConfiguration:
           EmailSendingAccount: COGNITO_DEFAULT
-        # Enable email verification
         AutoVerifiedAttributes:
           - email
-        # Email verification message template
         VerificationMessageTemplate:
           DefaultEmailOption: CONFIRM_WITH_CODE
           EmailMessage: "Your verification code is {####}"
@@ -100,21 +96,31 @@ resources:
           VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
           PostConfirmation: !GetAtt PostConfirmationLambdaFunction.Arn
 
-    CognitoUserPoolClient:
+    CognitoUserPoolClientSignup:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: email-phone-otp-auth-client-${self:provider.stage}
+        ClientName: email-phone-otp-auth-signup-${self:provider.stage}
         UserPoolId: !Ref CognitoUserPool
-        GenerateSecret: true
+        GenerateSecret: false
         EnableTokenRevocation: true
         PreventUserExistenceErrors: ENABLED
         ExplicitAuthFlows:
           - ALLOW_CUSTOM_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
-          - ALLOW_USER_SRP_AUTH
-          - ALLOW_USER_PASSWORD_AUTH
-          - ALLOW_ADMIN_USER_PASSWORD_AUTH
 
+    CognitoUserPoolClientLogin:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: email-phone-otp-auth-login-${self:provider.stage}
+        UserPoolId: !Ref CognitoUserPool
+        GenerateSecret: false
+        EnableTokenRevocation: true
+        PreventUserExistenceErrors: ENABLED
+        ExplicitAuthFlows:
+          - ALLOW_CUSTOM_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+
+    # Lambda trigger permissions
     PreSignUpPermission:
       Type: AWS::Lambda::Permission
       Properties:
@@ -159,20 +165,14 @@ resources:
     UserPoolId:
       Description: Cognito User Pool ID
       Value: !Ref CognitoUserPool
-      Export:
-        Name: ${self:service}-${self:provider.stage}-UserPoolId
 
-    UserPoolClientId:
-      Description: Cognito User Pool Client ID
-      Value: !Ref CognitoUserPoolClient
-      Export:
-        Name: ${self:service}-${self:provider.stage}-UserPoolClientId
+    SignupUserPoolClientId:
+      Description: Signup Cognito User Pool Client ID
+      Value: !Ref CognitoUserPoolClientSignup
 
-    UserPoolClientSecret:
-      Description: Cognito User Pool Client Secret
-      Value: !GetAtt CognitoUserPoolClient.ClientSecret
-      Export:
-        Name: ${self:service}-${self:provider.stage}-UserPoolClientSecret
+    LoginUserPoolClientId:
+      Description: Login Cognito User Pool Client ID
+      Value: !Ref CognitoUserPoolClientLogin
 
 plugins:
   - serverless-esbuild
@@ -180,22 +180,17 @@ plugins:
   - serverless-offline
 
 custom:
-  userPoolName: email-phone-otp-auth-pool-${self:provider.stage}
-
   esbuild:
     bundle: true
     minify: false
     sourcemap: true
     exclude: ['aws-sdk']
     target: 'node18'
-    external: []
-    metafile: false
-    define:
-      'require.resolve': undefined
     platform: 'node'
 
   serverless-offline:
     httpPort: 3000
+
   dotenv:
     exclude:
       - AWS_ACCESS_KEY_ID

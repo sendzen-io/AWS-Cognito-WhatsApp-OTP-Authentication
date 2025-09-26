@@ -18,6 +18,45 @@ The repo automatically creates and configures:
 - **IAM Permissions** for Lambda-Cognito integration
 - **CloudWatch Logs** for monitoring and debugging
 
+## 🎯 Key Features & Capabilities
+
+### 🔐 Authentication Features
+- **Custom Authentication Flow**: Seamless integration with AWS Cognito triggers
+- **WhatsApp OTP Delivery**: Secure OTP delivery via SendZen WhatsApp API
+- **Auto-Confirmation**: Streamlined user onboarding process
+- **Dual Client Architecture**: Separate clients for signup and login flows
+- **Session Management**: Robust session handling with automatic cleanup
+- **Rate Limiting**: Built-in protection against brute force attacks
+- **Error Handling**: Comprehensive error handling and user feedback
+
+### 📱 WhatsApp Integration Features
+- **SendZen API Integration**: Reliable WhatsApp Business API for OTP delivery
+- **Template Messages**: Pre-approved message templates for consistent branding
+- **Multi-Language Support**: Support for different languages and regions
+- **Error Handling**: Graceful API failure handling with retry mechanisms
+- **Delivery Tracking**: Comprehensive logging and monitoring of message delivery
+- **Template Management**: Easy template configuration and updates
+- **Fallback Handling**: Alternative delivery methods when WhatsApp fails
+
+### 🏗️ Architecture Features
+- **Serverless Architecture**: AWS Lambda functions for scalability and cost-effectiveness
+- **Cloud-Native**: Built on AWS services (Cognito, Lambda, CloudWatch)
+- **Microservices Design**: Modular Lambda functions for maintainability
+- **Infrastructure as Code**: Serverless Framework for automated deployment
+- **Monitoring & Logging**: CloudWatch integration for observability
+- **Auto-Scaling**: Automatic scaling based on demand
+- **High Availability**: Multi-AZ deployment for reliability
+
+### 🔒 Security Features
+- **Input Validation**: E.164 phone number format validation
+- **XSS Protection**: Framework built-in XSS protection
+- **CSRF Protection**: AWS Cognito's built-in CSRF protection
+- **Secure Storage**: Proper token storage with automatic cleanup
+- **Audit Trail**: Comprehensive logging for security monitoring
+- **Rate Limiting**: Protection against brute force attacks
+- **Secret Hash**: HMAC-SHA256 for secure client-server communication
+- **Token Security**: Secure JWT token management with automatic expiration
+
 ## 📋 Prerequisites
 
 ### Required Software
@@ -337,13 +376,83 @@ serverless deploy --region us-east-1
 
 ### Authentication Flow
 
-1. **User Registration**: User signs up with phone number and password
-2. **PreSignUp Trigger**: Auto-confirms user and sets `auth_purpose` attribute
-3. **Custom Auth Initiation**: System triggers custom authentication flow
-4. **DefineAuthChallenge**: Determines if OTP challenge is needed
-5. **CreateAuthChallenge**: Generates OTP and sends via SendZen WhatsApp API
-6. **VerifyAuthChallenge**: Validates OTP and updates user attributes
-7. **Token Issuance**: System issues JWT tokens upon successful verification
+#### 1. Signup Flow
+**Purpose**: Create new user accounts with WhatsApp verification
+
+**Detailed Steps**:
+1. **User Registration**:
+   - User enters phone number in E.164 format (+1234567890)
+   - Password validation (8+ characters with complexity requirements)
+   - Real-time form validation with immediate feedback
+   - Account creation with auto-confirmation enabled
+
+2. **PreSignUp Trigger**:
+   - Auto-confirms user and sets `auth_purpose` attribute
+   - Validates phone number format
+   - Sets custom attributes (auth_purpose = "signup")
+   - Enables custom authentication flow
+
+3. **Custom Auth Initiation**:
+   - System triggers custom authentication flow
+   - DefineAuthChallenge determines challenge type (CUSTOM_CHALLENGE)
+   - Challenge session established for OTP verification
+
+4. **CreateAuthChallenge**:
+   - Generates cryptographically secure 6-digit OTP
+   - Sends OTP via SendZen WhatsApp API
+   - Validates user verification status
+   - Handles API errors and retries
+
+5. **VerifyAuthChallenge**:
+   - Validates OTP against generated code
+   - Handles OTP expiry and format validation
+   - Updates user verification status
+   - Manages attempt limits and retry logic
+
+6. **PostConfirmation**:
+   - Finalizes user account setup
+   - Updates custom attributes
+   - Completes verification process
+   - Sets up user preferences
+
+7. **Token Issuance**:
+   - System issues JWT tokens upon successful verification
+   - Session established with proper expiration
+   - User redirected to authenticated dashboard
+
+#### 2. Login Flow
+**Purpose**: Authenticate existing users with WhatsApp OTP
+
+**Detailed Steps**:
+1. **Phone Number Entry**:
+   - User enters registered phone number
+   - Real-time validation and format checking
+   - Account existence verification
+
+2. **Account Validation**:
+   - System validates account exists and is confirmed
+   - User status and verification status checked
+   - Account eligibility for login verified
+
+3. **Custom Auth Initiation**:
+   - Custom authentication flow triggered
+   - DefineAuthChallenge determines challenge type
+   - Challenge session established
+
+4. **CreateAuthChallenge**:
+   - New OTP generated and sent via WhatsApp
+   - OTP stored securely with expiry
+   - Delivery confirmation logged
+
+5. **VerifyAuthChallenge**:
+   - User enters 6-digit OTP
+   - System validates OTP against generated code
+   - Verification status updated
+
+6. **Authentication Complete**:
+   - JWT tokens issued and stored securely
+   - Session established with proper expiration
+   - User redirected to authenticated dashboard
 
 ## 🔧 Configuration Details
 

@@ -3,54 +3,95 @@
 
 // // Create auth challenge - generate and send OTP over WhatsApp
 // export const handler: CreateAuthChallengeHandler = async (event: CreateAuthChallengeEvent) => {
+//   const { request, response } = event;
 //   try {
 //     console.log('createAuthChallenge:', JSON.stringify(event));
 
-//     const { request, response } = event;
 
+//     // Do NOT set response.failAuthentication here - not supported for Create
+//     const attrs = request.userAttributes || {};
+//     const phone = getUserPhoneNumber(attrs);
+//     const flow = request.clientMetadata?.flow; // optional hint from your app
+
+//     // If Cognito told us user not found, short-circuit with a one-step fail
 //     if (request.userNotFound) {
-//       (response as any).failAuthentication = true;
-//       (response as any).challengeMetadata = 'ERROR_USER_NOT_FOUND';
+//       response.publicChallengeParameters = {
+//         error: 'USER_NOT_FOUND',
+//         message: 'Account does not exist',
+//       };
+//       response.privateChallengeParameters = { shouldFail: 'true' };
 //       return logReturn('create_user_not_found', event);
 //     }
 
-//     const attrs = request.userAttributes || {};
-//     const phone = getUserPhoneNumber(attrs);
-
+//     // Block: missing phone
 //     if (!phone) {
-//       (response as any).failAuthentication = true;
-//       (response as any).challengeMetadata = 'ERROR_NO_PHONE_NUMBER';
+//       response.publicChallengeParameters = {
+//         error: 'NO_PHONE',
+//         message: 'Phone number is required',
+//       };
+//       response.privateChallengeParameters = { shouldFail: 'true' };
 //       return logReturn('create_no_phone', event);
 //     }
 
+//     // Block: bad phone format
 //     if (!isE164(phone)) {
-//       (response as any).failAuthentication = true;
-//       (response as any).challengeMetadata = 'ERROR_INVALID_PHONE_FORMAT';
+//       response.publicChallengeParameters = {
+//         error: 'BAD_PHONE_FORMAT',
+//         message: 'Phone number format is invalid',
+//       };
+//       response.privateChallengeParameters = { shouldFail: 'true' };
 //       return logReturn('create_bad_phone_format', event, { phone });
 //     }
 
-//     // generate a new code on every challenge
+//     // Decide which flow this is
+//     const isSignupRound =
+//       attrs['custom:auth_purpose'] === 'signup_whatsapp_verify' &&
+//       attrs['custom:whatsapp_verified'] !== 'true';
+
+//       if (flow === "login" && isSignupRound) {
+//         response.publicChallengeParameters = {
+//           error: "VERIFY_WHATSAPP_FIRST",
+//           message: "Please complete WhatsApp verification from signup.",
+//         };
+//         response.privateChallengeParameters = { shouldFail: "true" };
+//         return logReturn("create_block_login_during_signup", event);
+//       }
+
+//     // Guard: if not signup and user is not fully verified, do not send OTP
+//     const phoneVerified = attrs['phone_number_verified'] === 'true';
+//     const whatsappVerified = attrs['custom:whatsapp_verified'] === 'true';
+//     const needsVerification = !phoneVerified || !whatsappVerified;
+
+//     if (needsVerification && !isSignupRound && flow === "login") {
+//       response.publicChallengeParameters = {
+//         error: 'VERIFY_WHATSAPP_FIRST',
+//         message: 'Please complete WhatsApp and phone verification from signup.',
+//       };
+//       response.privateChallengeParameters = { shouldFail: 'true' };
+//       return logReturn('create_block_unverified_login', event);
+//     }
+
+//     // Generate OTP on every challenge
 //     const otp = generateOTP();
 //     const issuedAt = Date.now().toString();
 
-//     // store only in private parameters - Cognito passes these to verify handler
+//     // Store only in private parameters - passed to Verify
 //     response.privateChallengeParameters = { answer: otp, issuedAt };
 
-//     // label this round for Define to know how to finish
-//     const attrMap = Object.fromEntries(Object.entries(attrs));
-//     const isSignupRound =
-//       attrMap['custom:auth_purpose'] === 'signup_whatsapp_verify' &&
-//       attrMap['custom:whatsapp_verified'] !== 'true';
-//     (response as any).challengeMetadata = isSignupRound ? 'OTP_SIGNUP' : 'OTP_LOGIN';
+//     // Label for Define to know how to finish
+//     response.challengeMetadata = isSignupRound ? 'OTP_SIGNUP' : 'OTP_LOGIN';
 
 //     try {
 //       await sendOTPViaWhatsApp(phone, otp);
-//       console.log(`otp sent to ${phone} mode: ${(response as any).challengeMetadata}`);
+//       console.log(`otp sent to ${phone} mode: ${response.challengeMetadata}`);
 //     } catch (err: any) {
-//       console.error('send otp failed:', err.message);
-//       console.error('WhatsApp error details:', JSON.stringify(err, null, 2));
-//       (response as any).failAuthentication = true;
-//       (response as any).challengeMetadata = 'ERROR_WHATSAPP_SEND_FAILED';
+//       console.error('send otp failed:', err);
+//       response.publicChallengeParameters = {
+//         error: 'WHATSAPP_SEND_FAILED',
+//         message: 'Could not send code via WhatsApp',
+//       };
+//       response.privateChallengeParameters = { shouldFail: 'true' };
+//       // Do not set challengeMetadata to an error string
 //       return logReturn('create_whatsapp_send_failed', event, {
 //         whatsappError: err.whatsappError,
 //       });
@@ -59,120 +100,101 @@
 //     return logReturn('create_ok', event);
 //   } catch (error) {
 //     console.error('Unexpected error in createAuthChallenge:', error);
-//     (event.response as any).failAuthentication = true;
-//     (event.response as any).challengeMetadata = 'ERROR_UNEXPECTED';
+//     response.publicChallengeParameters = {
+//       error: 'UNEXPECTED',
+//       message: 'Unexpected error',
+//     };
+//     response.privateChallengeParameters = { shouldFail: 'true' };
 //     return logReturn('create_unexpected', event, { error: String(error) });
 //   }
 // };
 
+import { CreateAuthChallengeEvent, CreateAuthChallengeHandler } from "./types";
+import { getUserPhoneNumber, isE164, generateOTP, sendOTPViaWhatsApp, logReturn } from "./utils";
+import { getClientRole } from "./clientRole";
 
-import { CreateAuthChallengeEvent, CreateAuthChallengeHandler } from './types';
-import { getUserPhoneNumber, isE164, generateOTP, sendOTPViaWhatsApp, logReturn } from './utils';
+function isTrue(v?: string) {
+  return String(v).toLowerCase() === "true";
+}
 
-// Create auth challenge - generate and send OTP over WhatsApp
 export const handler: CreateAuthChallengeHandler = async (event: CreateAuthChallengeEvent) => {
-  const { request, response } = event;
+  const { request, response, callerContext, userPoolId } = event;
   try {
-    console.log('createAuthChallenge:', JSON.stringify(event));
+    console.log("createAuthChallenge:", JSON.stringify(event));
 
+    const role = await getClientRole(userPoolId, callerContext?.clientId);
 
-    // Do NOT set response.failAuthentication here - not supported for Create
+    if (request.userNotFound) {
+      response.privateChallengeParameters = { shouldFail: "true" };
+      response.publicChallengeParameters = { error: "USER_NOT_FOUND", message: "Account does not exist" };
+      return logReturn("create_user_not_found", event);
+    }
+
     const attrs = request.userAttributes || {};
     const phone = getUserPhoneNumber(attrs);
-    const flow = request.clientMetadata?.flow; // optional hint from your app
 
-    // If Cognito told us user not found, short-circuit with a one-step fail
-    if (request.userNotFound) {
-      response.publicChallengeParameters = {
-        error: 'USER_NOT_FOUND',
-        message: 'Account does not exist',
-      };
-      response.privateChallengeParameters = { shouldFail: 'true' };
-      return logReturn('create_user_not_found', event);
-    }
-
-    // Block: missing phone
     if (!phone) {
-      response.publicChallengeParameters = {
-        error: 'NO_PHONE',
-        message: 'Phone number is required',
-      };
-      response.privateChallengeParameters = { shouldFail: 'true' };
-      return logReturn('create_no_phone', event);
+      response.privateChallengeParameters = { shouldFail: "true" };
+      response.publicChallengeParameters = { error: "NO_PHONE", message: "Phone number is required" };
+      return logReturn("create_no_phone", event);
     }
-
-    // Block: bad phone format
     if (!isE164(phone)) {
-      response.publicChallengeParameters = {
-        error: 'BAD_PHONE_FORMAT',
-        message: 'Phone number format is invalid',
-      };
-      response.privateChallengeParameters = { shouldFail: 'true' };
-      return logReturn('create_bad_phone_format', event, { phone });
+      response.privateChallengeParameters = { shouldFail: "true" };
+      response.publicChallengeParameters = { error: "BAD_PHONE_FORMAT", message: "Phone number format is invalid" };
+      return logReturn("create_bad_phone_format", event, { phone });
     }
 
-    // Decide which flow this is
-    const isSignupRound =
-      attrs['custom:auth_purpose'] === 'signup_whatsapp_verify' &&
-      attrs['custom:whatsapp_verified'] !== 'true';
+    const emailVerified = isTrue(attrs["email_verified"]);
+    const waVerified = isTrue(attrs["custom:whatsapp_verified"]);
+    const phoneVerified = isTrue(attrs["phone_number_verified"]);
 
-      if (flow === "login" && isSignupRound) {
-        response.publicChallengeParameters = {
-          error: "VERIFY_WHATSAPP_FIRST",
-          message: "Please complete WhatsApp verification from signup.",
-        };
+    // hard separation by role with strict guards pre send
+    if (role === "SIGNUP") {
+      if (!emailVerified) {
         response.privateChallengeParameters = { shouldFail: "true" };
-        return logReturn("create_block_login_during_signup", event);
+        response.publicChallengeParameters = { error: "EMAIL_NOT_VERIFIED", message: "Verify email first" };
+        return logReturn("create_signup_email_not_verified", event);
       }
-
-    // Guard: if not signup and user is not fully verified, do not send OTP
-    const phoneVerified = attrs['phone_number_verified'] === 'true';
-    const whatsappVerified = attrs['custom:whatsapp_verified'] === 'true';
-    const needsVerification = !phoneVerified || !whatsappVerified;
-
-    if (needsVerification && !isSignupRound && flow === "login") {
-      response.publicChallengeParameters = {
-        error: 'VERIFY_WHATSAPP_FIRST',
-        message: 'Please complete WhatsApp and phone verification from signup.',
-      };
-      response.privateChallengeParameters = { shouldFail: 'true' };
-      return logReturn('create_block_unverified_login', event);
+      if (waVerified) {
+        response.privateChallengeParameters = { shouldFail: "true" };
+        response.publicChallengeParameters = { error: "ALREADY_VERIFIED", message: "WhatsApp already verified" };
+        return logReturn("create_signup_already_verified", event);
+      }
+    } else if (role === "LOGIN") {
+      if (!emailVerified || !waVerified || !phoneVerified) {
+        response.privateChallengeParameters = { shouldFail: "true" };
+        response.publicChallengeParameters = {
+          error: "VERIFY_FIRST",
+          message: "Complete account, email, phone and WhatsApp verification",
+        };
+        return logReturn("create_login_unverified_block", event, { emailVerified, waVerified, phoneVerified });
+      }
+    } else {
+      response.privateChallengeParameters = { shouldFail: "true" };
+      response.publicChallengeParameters = { error: "UNKNOWN_CLIENT", message: "Unknown client" };
+      return logReturn("create_unknown_client", event);
     }
 
-    // Generate OTP on every challenge
+    // generate and send
     const otp = generateOTP();
-    const issuedAt = Date.now().toString();
-
-    // Store only in private parameters - passed to Verify
-    response.privateChallengeParameters = { answer: otp, issuedAt };
-
-    // Label for Define to know how to finish
-    response.challengeMetadata = isSignupRound ? 'OTP_SIGNUP' : 'OTP_LOGIN';
+    response.privateChallengeParameters = {
+      answer: otp,
+      issuedAt: Date.now().toString(),
+    };
 
     try {
       await sendOTPViaWhatsApp(phone, otp);
-      console.log(`otp sent to ${phone} mode: ${response.challengeMetadata}`);
+      response.publicChallengeParameters = { channel: "whatsapp" };
+      return logReturn("create_ok", event);
     } catch (err: any) {
-      console.error('send otp failed:', err);
-      response.publicChallengeParameters = {
-        error: 'WHATSAPP_SEND_FAILED',
-        message: 'Could not send code via WhatsApp',
-      };
-      response.privateChallengeParameters = { shouldFail: 'true' };
-      // Do not set challengeMetadata to an error string
-      return logReturn('create_whatsapp_send_failed', event, {
-        whatsappError: err.whatsappError,
-      });
+      response.privateChallengeParameters = { shouldFail: "true" };
+      response.publicChallengeParameters = { error: "WHATSAPP_SEND_FAILED", message: "Could not send code" };
+      return logReturn("create_whatsapp_send_failed", event, { whatsappError: err?.whatsappError || String(err) });
     }
-
-    return logReturn('create_ok', event);
   } catch (error) {
-    console.error('Unexpected error in createAuthChallenge:', error);
-    response.publicChallengeParameters = {
-      error: 'UNEXPECTED',
-      message: 'Unexpected error',
-    };
-    response.privateChallengeParameters = { shouldFail: 'true' };
-    return logReturn('create_unexpected', event, { error: String(error) });
+    console.error("createAuthChallenge unexpected:", error);
+    response.privateChallengeParameters = { shouldFail: "true" };
+    response.publicChallengeParameters = { error: "UNEXPECTED", message: "Unexpected error" };
+    return logReturn("create_unexpected", event, { error: String(error) });
   }
 };

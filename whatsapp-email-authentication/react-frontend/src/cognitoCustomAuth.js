@@ -1,26 +1,10 @@
 // cognitoCustomAuth.js
 // Small helpers to run CUSTOM_AUTH using AWS SDK v3 directly in the browser.
-// For testing only if your app client has a secret.
+// Updated to work with client role system (no secret hash needed)
 const REGION = import.meta.env.VITE_AWS_REGION || "eu-west-1";
-const CLIENT_ID = import.meta.env.VITE_USER_POOL_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.VITE_USER_POOL_CLIENT_SECRET;
-// WebCrypto HMAC SHA-256 -> base64
-export async function generateSecretHash(username) {
-  if (!CLIENT_SECRET) throw new Error("Client secret is missing");
-  const enc = new TextEncoder();
-  const keyData = enc.encode(CLIENT_SECRET);
-  const msgData = enc.encode(username + CLIENT_ID);
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const sig = await crypto.subtle.sign("HMAC", cryptoKey, msgData);
-  const b64 = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return b64;
-}
+const SIGNUP_CLIENT_ID = import.meta.env.VITE_SIGNUP_CLIENT_ID;
+const LOGIN_CLIENT_ID = import.meta.env.VITE_LOGIN_CLIENT_ID;
+// Client role system - Lambdas determine role from client name
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -248,9 +232,10 @@ async function sdk() {
     GetUserCommand,
   };
 }
-/** * handleSignup * - Creates the user in Cognito.
+/** * handleSignup * - Creates the user in Cognito using signup client (no secret hash).
  * - Cognito automatically sends email verification.
  * - Returns { userSub, codeDeliveryDetails } for email verification.
+ * - Client role is determined by Lambda from client name containing "signup".
  */
 export async function handleSignup({ email, password, phone }) {
   if (!validateEmail(email)) throw new Error("Enter a valid email");
@@ -258,17 +243,17 @@ export async function handleSignup({ email, password, phone }) {
     throw new Error("Phone must be E.164 like +1234567890");
   if (!password || password.length < 8)
     throw new Error("Password must be at least 8 characters");
+  if (!SIGNUP_CLIENT_ID) throw new Error("Signup client ID is not configured");
+  
   email = normalizeUsername(email);
-  const secretHash = await generateSecretHash(email);
   const { client, SignUpCommand } = await sdk();
   try {
-    // Sign up - Cognito will automatically send email verification
+    // Sign up using signup client - Lambda will determine role from client name
     const result = await client.send(
       new SignUpCommand({
-        ClientId: CLIENT_ID,
+        ClientId: SIGNUP_CLIENT_ID,
         Username: email,
         Password: password,
-        SecretHash: secretHash,
         UserAttributes: [
           { Name: "email", Value: email },
           { Name: "phone_number", Value: phone },
@@ -306,20 +291,20 @@ export async function handleConfirmSignUp({ email, confirmationCode }) {
   if (!validateEmail(email)) throw new Error("Enter a valid email");
   if (!confirmationCode || confirmationCode.length !== 6)
     throw new Error("Enter a valid 6-digit confirmation code");
+  if (!SIGNUP_CLIENT_ID) throw new Error("Signup client ID is not configured");
+  
   email = normalizeUsername(email);
-  const secretHash = await generateSecretHash(email);
-  const { client, ConfirmSignUpCommand, InitiateAuthCommand } = await sdk();
+  const { client, ConfirmSignUpCommand } = await sdk();
   try {
-    // Confirm email verification
+    // Confirm email verification using signup client
     await client.send(
       new ConfirmSignUpCommand({
-        ClientId: CLIENT_ID,
+        ClientId: SIGNUP_CLIENT_ID,
         Username: email,
         ConfirmationCode: confirmationCode,
-        SecretHash: secretHash,
       })
     );
-    return await initiateAuthHelperForSignup({ email, secretHash });
+    return await initiateAuthHelperForSignup({ email });
   } catch (error) {
     console.error("Confirm signup error details:", error);
     const errorMessage = createDetailedErrorMessage(error, "ConfirmSignUp", {
@@ -329,17 +314,16 @@ export async function handleConfirmSignUp({ email, confirmationCode }) {
   }
 }
 
-const initiateAuthHelperForSignup = async ({ email, secretHash }) => {
+const initiateAuthHelperForSignup = async ({ email }) => {
   const { client, InitiateAuthCommand } = await sdk();
   try {
     const authParams = {
       AuthFlow: "CUSTOM_AUTH",
-      ClientId: CLIENT_ID,
-      ClientMetadata: { flow: "signup" },
-      AuthParameters: { USERNAME: email, SECRET_HASH: secretHash },
+      ClientId: SIGNUP_CLIENT_ID,
+      AuthParameters: { USERNAME: email },
     };
     console.log(
-      "InitiateAuthCommand params:",
+      "InitiateAuthCommand params for signup (role determined by client name):",
       JSON.stringify(authParams, null, 2)
     );
     const start = await client.send(new InitiateAuthCommand(authParams));
@@ -366,21 +350,21 @@ const initiateAuthHelperForSignup = async ({ email, secretHash }) => {
   }
 };
 
-/** * handleLogin * - Starts CUSTOM_AUTH for an existing user to send the OTP. * - Returns { session } for OTP verification. */
+/** * handleLogin * - Starts CUSTOM_AUTH for an existing user to send the OTP using login client. * - Returns { session } for OTP verification. * - Client role is determined by Lambda from client name containing "login". */
 export async function handleLogin({ email }) {
   if (!validateEmail(email)) throw new Error("Enter a valid email");
+  if (!LOGIN_CLIENT_ID) throw new Error("Login client ID is not configured");
+  
   email = normalizeUsername(email);
-  const secretHash = await generateSecretHash(email);
   const { client, InitiateAuthCommand } = await sdk();
   try {
     const authParams = {
       AuthFlow: "CUSTOM_AUTH",
-      ClientId: CLIENT_ID,
-      ClientMetadata: { flow: "login" },
-      AuthParameters: { USERNAME: email, SECRET_HASH: secretHash },
+      ClientId: LOGIN_CLIENT_ID,
+      AuthParameters: { USERNAME: email },
     };
     console.log(
-      "Login InitiateAuthCommand params:",
+      "Login InitiateAuthCommand params (role determined by client name):",
       JSON.stringify(authParams, null, 2)
     );
     const start = await client.send(new InitiateAuthCommand(authParams));
@@ -408,25 +392,25 @@ export async function handleVerifyOtp({
   otp,
   session,
   usernameForChallenge,
+  clientId, // Need to know which client was used for the challenge
 }) {
   if (!/^\d{6}$/.test(String(otp))) throw new Error("Enter a 6 digit code");
   if (!session) throw new Error("Missing session");
+  if (!clientId) throw new Error("Client ID is required for OTP verification");
 
   email = normalizeUsername(email);
   const username = usernameForChallenge || email;
-  const secretHash = await generateSecretHash(username);
   const { client, RespondToAuthChallengeCommand } = await sdk();
 
   try {
     const res = await client.send(
       new RespondToAuthChallengeCommand({
-        ClientId: CLIENT_ID,
+        ClientId: clientId,
         ChallengeName: "CUSTOM_CHALLENGE",
         Session: session,
         ChallengeResponses: {
           USERNAME: username,
           ANSWER: String(otp),
-          SECRET_HASH: secretHash,
         },
       })
     );
@@ -513,9 +497,15 @@ export async function handleVerifyOtp({
   }
 }
 /** * handleResendOtp * - Starts a new CUSTOM_AUTH round. Updates session. */
-export async function handleResendOtp({ email }) {
+export async function handleResendOtp({ email, isSignupFlow = false }) {
   try {
-    return await handleLogin({ email });
+    if (isSignupFlow) {
+      // For signup flow, use signup client
+      return await initiateAuthHelperForSignup({ email });
+    } else {
+      // For login flow, use login client
+      return await handleLogin({ email });
+    }
   } catch (error) {
     console.error("Resend OTP error details:", error);
     const errorMessage = createDetailedErrorMessage(error, "ResendOtp", {
