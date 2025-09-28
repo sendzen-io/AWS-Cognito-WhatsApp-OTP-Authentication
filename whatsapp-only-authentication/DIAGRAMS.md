@@ -2,20 +2,20 @@
 
 ## Architecture Diagram
 
-![Architecture Diagram](diagrams/WA_Email_Architecture.svg)
+![Architecture Diagram](diagrams/WA_Only_Architecture.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
 
 ```plantuml
-@startuml WhatsApp-Email Authentication System Architecture
+@startuml WhatsApp-Only Authentication System Architecture
 
 !theme aws-orange
-title WhatsApp-Email Authentication System Architecture
+title WhatsApp-Only Authentication System Architecture
 
 package "Frontend Layer" {
-  [React Frontend] as React
-  [AWS Amplify SDK] as Amplify
+  [Next.js Frontend] as NextJS
+  [AWS SDK v3] as AWSSDK
 }
 
 package "AWS Cognito" {
@@ -34,15 +34,15 @@ package "Lambda Functions" {
 
 package "External Services" {
   [SendZen WhatsApp API] as SendZen
-  [Cognito Email Service] as Email
 }
 
 package "Storage" {
   [CloudWatch Logs] as CloudWatch
+  database "DynamoDB (Optional)" as DynamoDB
 }
 
-React --> Amplify
-Amplify --> UserPool
+NextJS --> AWSSDK
+AWSSDK --> UserPool
 UserPool --> SignupClient
 UserPool --> LoginClient
 
@@ -53,7 +53,6 @@ UserPool --> VerifyAuth
 UserPool --> PostConfirm
 
 CreateAuth --> SendZen
-UserPool --> Email
 
 PreSignUp --> CloudWatch
 DefineAuth --> CloudWatch
@@ -68,37 +67,30 @@ PostConfirm --> CloudWatch
 
 ## Authentication Flow Diagram
 
-![Authentication Flow Diagram](diagrams/WA_Email_Authentication_Flow.svg)
+![Authentication Flow Diagram](diagrams/WA_Only_Authentication_Flow.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
 
 ```plantuml
-@startuml WhatsApp-Email Authentication Flow
+@startuml WhatsApp-Only Authentication Flow
 
 !theme aws-orange
-title WhatsApp-Email Authentication Flow
+title WhatsApp-Only Authentication Flow
 
 actor User
-participant "React Frontend" as Frontend
+participant "Next.js Frontend" as Frontend
 participant "AWS Cognito" as Cognito
 participant "Lambda Functions" as Lambda
 participant "SendZen API" as SendZen
-participant "Email Service" as Email
 
 == Signup Flow ==
 
-User -> Frontend: Enter email, phone, password
+User -> Frontend: Enter phone, password
 Frontend -> Cognito: SignUp (Signup Client)
 Cognito -> Lambda: PreSignUp Trigger
-Lambda --> Cognito: Auto-confirm: false
-Cognito -> Email: Send email verification
-Email --> User: Email with 6-digit code
+Lambda --> Cognito: Auto-confirm: true
 Cognito --> Frontend: UserSub, Session
-
-User -> Frontend: Enter email confirmation code
-Frontend -> Cognito: ConfirmSignUp
-Cognito --> Frontend: Success
 
 Frontend -> Cognito: InitiateAuth (CUSTOM_AUTH)
 Cognito -> Lambda: DefineAuthChallenge
@@ -119,7 +111,7 @@ Cognito --> Frontend: Authentication tokens
 
 == Login Flow ==
 
-User -> Frontend: Enter email
+User -> Frontend: Enter phone number
 Frontend -> Cognito: InitiateAuth (Login Client)
 Cognito -> Lambda: DefineAuthChallenge
 Lambda --> Cognito: CUSTOM_CHALLENGE
@@ -142,7 +134,7 @@ Cognito --> Frontend: Authentication tokens
 
 ## Component Interaction Diagram
 
-![Component Interaction Diagram](diagrams/WA_Email_Component_Interaction.svg)
+![Component Interaction Diagram](diagrams/WA_Only_Component_Interaction.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
@@ -154,16 +146,15 @@ Cognito --> Frontend: Authentication tokens
 title Frontend Component Interactions
 
 package "Frontend Components" {
-  [App.jsx] as App
-  [Signup Form] as SignupForm
-  [Login Form] as LoginForm
-  [OTP Form] as OTPForm
-  [Error Display] as ErrorDisplay
-  [Success Display] as SuccessDisplay
+  [page.tsx] as App
+  [SignupForm.tsx] as SignupForm
+  [LoginForm.tsx] as LoginForm
+  [OTPVerification.tsx] as OTPForm
+  [Dashboard.tsx] as Dashboard
 }
 
 package "Authentication Logic" {
-  [cognitoCustomAuth.js] as CognitoAuth
+  [authService.ts] as AuthService
   [Error Handler] as ErrorHandler
   [Input Validation] as Validation
 }
@@ -177,22 +168,21 @@ package "AWS Services" {
 App --> SignupForm
 App --> LoginForm
 App --> OTPForm
-App --> ErrorDisplay
-App --> SuccessDisplay
+App --> Dashboard
 
-SignupForm --> CognitoAuth
-LoginForm --> CognitoAuth
-OTPForm --> CognitoAuth
+SignupForm --> AuthService
+LoginForm --> AuthService
+OTPForm --> AuthService
 
-CognitoAuth --> Validation
-CognitoAuth --> ErrorHandler
-CognitoAuth --> Cognito
+AuthService --> Validation
+AuthService --> ErrorHandler
+AuthService --> Cognito
 
 Cognito --> Lambda
 Lambda --> SendZen
 
-ErrorHandler --> ErrorDisplay
-Validation --> ErrorDisplay
+ErrorHandler --> Dashboard
+Validation --> Dashboard
 
 @enduml
 ```
@@ -201,65 +191,59 @@ Validation --> ErrorDisplay
 
 ## User Experience Flow Diagram
 
-![User Experience Flow Diagram](diagrams/WA_Email_UX_Flow.svg)
+![User Experience Flow Diagram](diagrams/WA_Only_UX_Flow.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
 
 ```plantuml
-@startuml User Experience Flow
-
+@startuml
 !theme aws-orange
 title User Experience Flow
 
+' Main Flow
 [*] --> SignupPage
 
-SignupPage --> EmailConfirmation : Valid signup
+SignupPage --> WhatsAppOTP : Valid signup
 SignupPage --> SignupPage : Invalid input
+SignupPage --> LoginPage : Switch to login
 
-EmailConfirmation --> WhatsAppOTP : Valid email code
-EmailConfirmation --> EmailConfirmation : Invalid email code
-EmailConfirmation --> SignupPage : Back
+LoginPage --> SignupPage : Switch to signup
+LoginPage --> WhatsAppOTP : Valid phone
+LoginPage --> LoginPage : Invalid phone
 
 WhatsAppOTP --> Success : Valid OTP
 WhatsAppOTP --> WhatsAppOTP : Invalid OTP
-WhatsAppOTP --> EmailConfirmation : Back (signup)
-WhatsAppOTP --> LoginPage : Back (login)
+WhatsAppOTP --> SignupPage : Back
 
 Success --> [*] : Continue
 
-SignupPage --> LoginPage : Switch to login
-LoginPage --> SignupPage : Switch to signup
-
-LoginPage --> WhatsAppOTP : Valid email
-LoginPage --> LoginPage : Invalid email
-
+' --- Nested States ---
 state SignupPage {
-  [*] --> EmailInput
-  EmailInput --> PhoneInput : Valid email
-  PhoneInput --> PasswordInput : Valid phone
-  PasswordInput --> Submit : Valid password
-  Submit --> [*] : Submit
+    [*] --> PhoneInput
+    PhoneInput --> PasswordInput : Valid phone
+    PasswordInput --> Submit : Valid password
+    Submit --> [*] : Submit
 }
 
-state EmailConfirmation {
-  [*] --> CodeInput
-  CodeInput --> Submit : Valid code
-  Submit --> [*] : Submit
+state LoginPage {
+    [*] --> PhoneInput
+    PhoneInput --> Submit : Valid phone
+    Submit --> [*] : Submit
 }
 
 state WhatsAppOTP {
-  [*] --> OTPInput
-  OTPInput --> Submit : Valid OTP
-  Submit --> [*] : Submit
+    [*] --> OTPInput
+    OTPInput --> Submit : Valid OTP
+    Submit --> [*] : Submit
 }
 
 state Success {
-  [*] --> UserInfo
-  UserInfo --> Continue : Continue
-  UserInfo --> Logout : Logout
-  Continue --> [*]
-  Logout --> [*]
+    [*] --> UserInfo
+    UserInfo --> Continue : Continue
+    UserInfo --> Logout : Logout
+    Continue --> [*]
+    Logout --> [*]
 }
 
 @enduml
@@ -269,7 +253,7 @@ state Success {
 
 ## Lambda Function Architecture
 
-![Lambda Function Architecture](diagrams/WA_Email_Lambda_Architecture.svg)
+![Lambda Function Architecture](diagrams/WA_Only_Lambda_Architecture.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
@@ -283,8 +267,8 @@ title Lambda Function Architecture
 package "Lambda Functions" {
   package "PreSignUp" {
     [Validate phone number] as PS1
-    [Set auto-confirm false] as PS2
-    [Enable email verification] as PS3
+    [Set auto-confirm true] as PS2
+    [Set custom attributes] as PS3
   }
   
   package "DefineAuthChallenge" {
@@ -351,7 +335,7 @@ PC1 --> CognitoClient
 
 ## Data Flow Diagram
 
-![Data Flow Diagram](diagrams/WA_Email_Data_Flow.svg)
+![Data Flow Diagram](diagrams/WA_Only_Data_Flow.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
@@ -363,7 +347,6 @@ PC1 --> CognitoClient
 title Data Flow
 
 package "User Input" {
-  [Email Address] as Email
   [Phone Number] as Phone
   [Password] as Password
   [OTP Code] as OTP
@@ -391,7 +374,6 @@ package "Lambda Processing" {
 
 package "External Services" {
   [SendZen API] as SendZen
-  [Email Service] as EmailService
 }
 
 package "Storage" {
@@ -399,7 +381,6 @@ package "Storage" {
   [User Data] as UserData
 }
 
-Email --> Validation
 Phone --> Validation
 Password --> Validation
 OTP --> Validation
@@ -432,7 +413,7 @@ StatusUpdate --> CloudWatch
 
 ## Error Handling Flow
 
-![Error Handling Flow](diagrams/WA_Email_Error_Handling.svg)
+![Error Handling Flow](diagrams/WA_Only_Error_Handling.svg)
 
 <details>
 <summary>Click to expand PlantUML code</summary>
