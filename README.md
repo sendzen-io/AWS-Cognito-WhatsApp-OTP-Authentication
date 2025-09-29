@@ -75,8 +75,6 @@ AWS-Cognito-WhatsApp-OTP-Authentication/
 │       ├── package.json                 # Dependencies
 │       ├── env.example                  # Environment template
 │       └── README.md                    # Frontend documentation
-├── docs/                                # Documentation
-├── .github/workflows/                   # GitHub Actions
 ├── LICENSE                              # License file
 └── README.md                            # This file
 ```
